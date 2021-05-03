@@ -48,3 +48,5 @@ Thumbs.db
 *.mov
 *.wmv
 
+# DB datafiles
+/DB/maria-compose/db_data

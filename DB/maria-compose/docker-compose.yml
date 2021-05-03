@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+        mariadb:
+            image: mariadb:latest
+            restart: always
+            environment:
+                 - MYSQL_ROOT_PASSWORD=hoseolab420
+            volumes:
+                 - ./db_data:/var/lib/mysql
+                 - ./maria-init-files/:/docker-entrypoint-initdb.d/
+            ports:
+                 - '3306:3306'
