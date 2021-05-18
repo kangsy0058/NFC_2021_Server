@@ -42,8 +42,6 @@ CREATE TABLE IF NOT EXISTS `group_info` (
 -- 테이블 데이터 hoseo.group_info:~0 rows (대략적) 내보내기
 DELETE FROM `group_info`;
 /*!40000 ALTER TABLE `group_info` DISABLE KEYS */;
-INSERT INTO `group_info` (`group_code`, `address`, `group_name`) VALUES
-	(1, 'test', 'test');
 /*!40000 ALTER TABLE `group_info` ENABLE KEYS */;
 
 -- 테이블 hoseo.kiosk_set 구조 내보내기
@@ -54,9 +52,12 @@ CREATE TABLE IF NOT EXISTS `kiosk_set` (
   `latitude` float NOT NULL,
   `longitude` float NOT NULL,
   `group_code` bigint(20) NOT NULL,
+  `wearable_serial_number` varchar(20) NOT NULL,
   PRIMARY KEY (`kiosk_serial_number`),
   KEY `group_code` (`group_code`),
-  CONSTRAINT `kiosk_set_ibfk_1` FOREIGN KEY (`group_code`) REFERENCES `group_info` (`group_code`)
+  KEY `kiosk_set_ibfk_2` (`wearable_serial_number`),
+  CONSTRAINT `kiosk_set_ibfk_1` FOREIGN KEY (`group_code`) REFERENCES `group_info` (`group_code`),
+  CONSTRAINT `kiosk_set_ibfk_2` FOREIGN KEY (`wearable_serial_number`) REFERENCES `user_log` (`wearable_serial_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 테이블 데이터 hoseo.kiosk_set:~0 rows (대략적) 내보내기
@@ -88,10 +89,7 @@ CREATE TABLE IF NOT EXISTS `user_log` (
   `date` date NOT NULL,
   `time` time NOT NULL,
   `temp` float NOT NULL,
-  `kiosk_serial_number` varchar(20) NOT NULL,
-  PRIMARY KEY (`wearable_serial_number`),
-  KEY `kiosk_serial_number` (`kiosk_serial_number`),
-  CONSTRAINT `user_log_ibfk_1` FOREIGN KEY (`kiosk_serial_number`) REFERENCES `kiosk_set` (`kiosk_serial_number`)
+  PRIMARY KEY (`wearable_serial_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 테이블 데이터 hoseo.user_log:~0 rows (대략적) 내보내기

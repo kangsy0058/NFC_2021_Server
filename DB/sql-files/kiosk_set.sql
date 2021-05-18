@@ -2,7 +2,7 @@
 -- 호스트:                          127.0.0.1
 -- 서버 버전:                        10.6.0-MariaDB - mariadb.org binary distribution
 -- 서버 OS:                        Win64
--- HeidiSQL 버전:                  11.2.0.6213
+-- HeidiSQL 버전:                  11.1.0.6116
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -14,12 +14,10 @@
 
 
 -- hoseo 데이터베이스 구조 내보내기
-DROP DATABASE IF EXISTS `hoseo`;
 CREATE DATABASE IF NOT EXISTS `hoseo` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `hoseo`;
 
 -- 테이블 hoseo.kiosk_set 구조 내보내기
-DROP TABLE IF EXISTS `kiosk_set`;
 CREATE TABLE IF NOT EXISTS `kiosk_set` (
   `kiosk_serial_number` varchar(20) NOT NULL,
   `building_nmae` varchar(20) NOT NULL,
@@ -27,9 +25,12 @@ CREATE TABLE IF NOT EXISTS `kiosk_set` (
   `latitude` float NOT NULL,
   `longitude` float NOT NULL,
   `group_code` bigint(20) NOT NULL,
+  `wearable_serial_number` varchar(20) NOT NULL,
   PRIMARY KEY (`kiosk_serial_number`),
   KEY `group_code` (`group_code`),
-  CONSTRAINT `kiosk_set_ibfk_1` FOREIGN KEY (`group_code`) REFERENCES `group_info` (`group_code`)
+  KEY `kiosk_set_ibfk_2` (`wearable_serial_number`),
+  CONSTRAINT `kiosk_set_ibfk_1` FOREIGN KEY (`group_code`) REFERENCES `group_info` (`group_code`),
+  CONSTRAINT `kiosk_set_ibfk_2` FOREIGN KEY (`wearable_serial_number`) REFERENCES `user_log` (`wearable_serial_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 테이블 데이터 hoseo.kiosk_set:~0 rows (대략적) 내보내기
@@ -38,6 +39,6 @@ DELETE FROM `kiosk_set`;
 /*!40000 ALTER TABLE `kiosk_set` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
