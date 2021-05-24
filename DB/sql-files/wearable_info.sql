@@ -14,25 +14,22 @@
 
 
 -- hoseo 데이터베이스 구조 내보내기
-DROP DATABASE IF EXISTS `hoseo`;
 CREATE DATABASE IF NOT EXISTS `hoseo` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `hoseo`;
 
--- 테이블 hoseo.group_info 구조 내보내기
-DROP TABLE IF EXISTS `group_info`;
-CREATE TABLE IF NOT EXISTS `group_info` (
-  `group_code` bigint(20) NOT NULL,
-  `address` varchar(30) DEFAULT NULL,
-  `group_name` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`group_code`)
+-- 테이블 hoseo.wearable_info 구조 내보내기
+CREATE TABLE IF NOT EXISTS `wearable_info` (
+  `wearable_SN` varchar(45) NOT NULL,
+  `UUID` varchar(45) NOT NULL,
+  PRIMARY KEY (`wearable_SN`),
+  KEY `FK1_UUID` (`UUID`),
+  CONSTRAINT `FK1_UUID` FOREIGN KEY (`UUID`) REFERENCES `user_info` (`UUID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 테이블 데이터 hoseo.group_info:~1 rows (대략적) 내보내기
-DELETE FROM `group_info`;
-/*!40000 ALTER TABLE `group_info` DISABLE KEYS */;
-INSERT INTO `group_info` (`group_code`, `address`, `group_name`) VALUES
-	(1, 'test', 'test');
-/*!40000 ALTER TABLE `group_info` ENABLE KEYS */;
+-- 테이블 데이터 hoseo.wearable_info:~0 rows (대략적) 내보내기
+DELETE FROM `wearable_info`;
+/*!40000 ALTER TABLE `wearable_info` DISABLE KEYS */;
+/*!40000 ALTER TABLE `wearable_info` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

@@ -14,24 +14,21 @@
 
 
 -- hoseo 데이터베이스 구조 내보내기
-DROP DATABASE IF EXISTS `hoseo`;
 CREATE DATABASE IF NOT EXISTS `hoseo` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `hoseo`;
 
--- 테이블 hoseo.admin_info 구조 내보내기
-DROP TABLE IF EXISTS `admin_info`;
-CREATE TABLE IF NOT EXISTS `admin_info` (
-  `admin_login` varchar(20) NOT NULL,
-  `group_code` bigint(20) NOT NULL,
-  PRIMARY KEY (`admin_login`),
-  KEY `group_code` (`group_code`),
-  CONSTRAINT `admin_info_ibfk_1` FOREIGN KEY (`group_code`) REFERENCES `group_info` (`group_code`)
+-- 테이블 hoseo.group_list 구조 내보내기
+CREATE TABLE IF NOT EXISTS `group_list` (
+  `Group_code` varchar(45) NOT NULL,
+  `Group_name` varchar(45) NOT NULL,
+  `address` varchar(45) NOT NULL,
+  PRIMARY KEY (`Group_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 테이블 데이터 hoseo.admin_info:~0 rows (대략적) 내보내기
-DELETE FROM `admin_info`;
-/*!40000 ALTER TABLE `admin_info` DISABLE KEYS */;
-/*!40000 ALTER TABLE `admin_info` ENABLE KEYS */;
+-- 테이블 데이터 hoseo.group_list:~0 rows (대략적) 내보내기
+DELETE FROM `group_list`;
+/*!40000 ALTER TABLE `group_list` DISABLE KEYS */;
+/*!40000 ALTER TABLE `group_list` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

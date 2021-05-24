@@ -17,23 +17,20 @@
 CREATE DATABASE IF NOT EXISTS `hoseo` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `hoseo`;
 
--- 테이블 hoseo.kiosk_set 구조 내보내기
-CREATE TABLE IF NOT EXISTS `kiosk_set` (
-  `kiosk_SN` varchar(45) NOT NULL COMMENT '키오스크 S/N',
-  `Group_code` varchar(45) DEFAULT NULL COMMENT '그룹코드',
-  `detail_position` varchar(100) DEFAULT NULL COMMENT '상세위치',
-  `building_name` varchar(45) DEFAULT NULL COMMENT '건물명',
-  `latitude` float DEFAULT NULL COMMENT '위도',
-  `longitude` float DEFAULT NULL COMMENT '경도',
-  PRIMARY KEY (`kiosk_SN`),
-  KEY `FK_Kiosk_Set_Group_code_Group_list_Group_code` (`Group_code`),
-  CONSTRAINT `FK_Kiosk_Set_Group_code_Group_list_Group_code` FOREIGN KEY (`Group_code`) REFERENCES `group_list` (`Group_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Kiosk 설정값';
+-- 테이블 hoseo.group_map 구조 내보내기
+CREATE TABLE IF NOT EXISTS `group_map` (
+  `Group_code` varchar(45) NOT NULL,
+  `UUID` varchar(45) NOT NULL,
+  KEY `FK2_UUID` (`UUID`),
+  KEY `FK1_Group_code` (`Group_code`),
+  CONSTRAINT `FK1_Group_code` FOREIGN KEY (`Group_code`) REFERENCES `group_list` (`Group_code`),
+  CONSTRAINT `FK2_UUID` FOREIGN KEY (`UUID`) REFERENCES `user_info` (`UUID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- 테이블 데이터 hoseo.kiosk_set:~0 rows (대략적) 내보내기
-DELETE FROM `kiosk_set`;
-/*!40000 ALTER TABLE `kiosk_set` DISABLE KEYS */;
-/*!40000 ALTER TABLE `kiosk_set` ENABLE KEYS */;
+-- 테이블 데이터 hoseo.group_map:~0 rows (대략적) 내보내기
+DELETE FROM `group_map`;
+/*!40000 ALTER TABLE `group_map` DISABLE KEYS */;
+/*!40000 ALTER TABLE `group_map` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

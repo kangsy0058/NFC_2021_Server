@@ -19,12 +19,23 @@ USE `hoseo`;
 
 -- 테이블 hoseo.user_log 구조 내보내기
 CREATE TABLE IF NOT EXISTS `user_log` (
-  `wearable_serial_number` varchar(20) NOT NULL,
-  `date` date NOT NULL,
-  `time` time NOT NULL,
-  `temp` float NOT NULL,
-  PRIMARY KEY (`wearable_serial_number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `IDX` int(11) NOT NULL AUTO_INCREMENT COMMENT '순번',
+  `wearable_SN` varchar(45) DEFAULT NULL COMMENT '웨어러블 S/N',
+  `kiosk_SN` varchar(45) DEFAULT NULL COMMENT '키오스크 S/N',
+  `time` time DEFAULT NULL COMMENT '시간',
+  `date` date DEFAULT NULL COMMENT '날짜',
+  `temp` float DEFAULT NULL COMMENT '체온',
+  `Group_code` varchar(45) DEFAULT NULL COMMENT '그룹코드',
+  `detail_position` varchar(100) DEFAULT NULL COMMENT '상세위치',
+  `building_name` varchar(45) DEFAULT NULL COMMENT '건물명',
+  `latitude` float DEFAULT NULL COMMENT '위도',
+  `longitude` float DEFAULT NULL COMMENT '경도',
+  PRIMARY KEY (`IDX`),
+  KEY `FK_User_log_kiosk_SN_Kiosk_Set_kiosk_SN` (`kiosk_SN`),
+  KEY `FK_User_log_wearable_SN_Wearable_info_wearable_SN` (`wearable_SN`),
+  CONSTRAINT `FK_User_log_kiosk_SN_Kiosk_Set_kiosk_SN` FOREIGN KEY (`kiosk_SN`) REFERENCES `kiosk_set` (`kiosk_SN`),
+  CONSTRAINT `FK_User_log_wearable_SN_Wearable_info_wearable_SN` FOREIGN KEY (`wearable_SN`) REFERENCES `wearable_info` (`wearable_SN`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='이용자 로그';
 
 -- 테이블 데이터 hoseo.user_log:~0 rows (대략적) 내보내기
 DELETE FROM `user_log`;

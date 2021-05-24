@@ -2,7 +2,7 @@
 -- 호스트:                          127.0.0.1
 -- 서버 버전:                        10.6.0-MariaDB - mariadb.org binary distribution
 -- 서버 OS:                        Win64
--- HeidiSQL 버전:                  11.2.0.6213
+-- HeidiSQL 버전:                  11.1.0.6116
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -19,15 +19,15 @@ USE `hoseo`;
 
 -- 테이블 hoseo.user_info 구조 내보내기
 CREATE TABLE IF NOT EXISTS `user_info` (
-  `uuid` int(11) NOT NULL AUTO_INCREMENT,
-  `token` varchar(50) NOT NULL,
-  `personal_safety_number` varchar(50) NOT NULL,
-  `login` varchar(20) NOT NULL,
-  `push` char(1) NOT NULL,
-  `wearable_serial_number` varchar(20) NOT NULL,
-  PRIMARY KEY (`uuid`),
-  KEY `wearable_serial_number` (`wearable_serial_number`),
-  CONSTRAINT `user_info_ibfk_1` FOREIGN KEY (`wearable_serial_number`) REFERENCES `user_log` (`wearable_serial_number`)
+  `UUID` varchar(45) NOT NULL,
+  `email` varchar(45) NOT NULL,
+  `displayname` varchar(45) NOT NULL,
+  `token` varchar(45) NOT NULL,
+  `PSN` varchar(45) NOT NULL,
+  `PSN_img` varchar(100) NOT NULL,
+  `ls_admin` tinyint(1) NOT NULL DEFAULT 0,
+  `wearable_SN` varchar(45) NOT NULL,
+  PRIMARY KEY (`UUID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 테이블 데이터 hoseo.user_info:~0 rows (대략적) 내보내기
@@ -36,6 +36,6 @@ DELETE FROM `user_info`;
 /*!40000 ALTER TABLE `user_info` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
