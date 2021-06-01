@@ -25,9 +25,9 @@ cur = conn.cursor()
 
 
 # Running consumer 
-print('[begin] get consumer list')
+print('[begin] get consumer list', flush=True)
 for message in consumer:
-    print("Topic: %s, Partition: %d, Offset: %d, Key: %s, Value: %s" % ( message.topic, message.partition, message.offset, message.key, message.value ))
+    print("Topic: %s, Partition: %d, Offset: %d, Key: %s, Value: %s" % ( message.topic, message.partition, message.offset, message.key, message.value ), flush=True)
     rec_val = message.value
 
     #get kiosk detail
@@ -36,9 +36,10 @@ for message in consumer:
     # kiosk_SN, Group_code, detail_position, building_namem latitude, longitude
     _, G_code, detail_P, building_N, lat, lg = cur.fetchall()[0]
 
-    log_send_sql = f'INSERT INTO user_log (wearable_SN, kiosk_SN, time, date, temp, Group_code, detail_position, building_name, latitude, longitude) VALUES ("{rec_val["wearable_SN"]}", "{rec_val["kiosk_SN"]}", "{rec_val["time"]}", "{rec_val["date"]}", "{rec_val["temp"]}", "{G_code}", "{detail_P}", "{building_N}", "{lat}", "{lg}")'
-    print(log_send_sql)
-    cur.execute("INSERT INTO user_log (wearable_SN, kiosk_SN, time, date, temp, Group_code, detail_position, building_name, latitude, longitude) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (rec_val["wearable_SN"], rec_val["kiosk_SN"], rec_val["time"], rec_val["date"], rec_val["temp"], G_code, detail_P, building_N, lat, lg))
+    print(f'Group_code = {G_code} detail_position = {detail_P} building_namem = {building_N} latitude = {lat} longitude = {lg}', flush=True)
+
+    log_send_sql = "INSERT INTO user_log (wearable_SN, kiosk_SN, time, date, temp, Group_code, detail_position, building_name, latitude, longitude) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    cur.execute(log_send_sql, (rec_val["wearable_SN"], rec_val["kiosk_SN"], rec_val["time"], rec_val["date"], rec_val["temp"], G_code, detail_P, building_N, lat, lg))
     conn.commit()
     
 

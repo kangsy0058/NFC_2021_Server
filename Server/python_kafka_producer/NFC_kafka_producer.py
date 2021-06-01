@@ -40,6 +40,7 @@ for i in range(1000):
     data = make_rand_log()
     producer.send('user-check-in', value=data)
     producer.flush()
+    break
 
 
 print("finish send log")
