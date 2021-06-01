@@ -1,0 +1,17 @@
+{
+    "kafka": {
+      "topic": "user-check-in",
+      "bootstrap_servers": ["59.27.40.116:9092"],
+      "auto_offset_reset": "latest",
+      "enable_auto_commit": true,
+      "group_id": "userdb-group"
+    },
+
+    "mariadb": {
+      "host": "59.27.40.116",
+      "user": "root",
+      "password": "hoseolab420",
+      "db": "hoseo",
+      "charset": "utf8"
+    }
+}
