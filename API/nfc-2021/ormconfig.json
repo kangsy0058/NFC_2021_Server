@@ -1,0 +1,11 @@
+{
+  "type": "mariadb",
+  "host": "210.119.104.207",
+  "port": 3306,
+  "username": "root",
+  "password": "hoseolab420",
+  "database": "hoseo",
+  "entities": ["src/api/entities/**/*.entity{.ts,.js}"],
+  "logging": true,
+  "synchronize": true
+}
