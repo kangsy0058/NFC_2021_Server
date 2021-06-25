@@ -1,0 +1,9 @@
+basePath: /api/v1
+host: localhost
+info:
+  contact: {}
+  description: Hoseo NFC 2021 projct API Page
+  title: NFC API
+  version: 0.0.1
+paths: {}
+swagger: "2.0"

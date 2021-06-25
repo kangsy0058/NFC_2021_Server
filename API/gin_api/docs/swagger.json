@@ -1,0 +1,12 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Hoseo NFC 2021 projct API Page",
+        "title": "NFC API",
+        "contact": {},
+        "version": "0.0.1"
+    },
+    "host": "localhost",
+    "basePath": "/api/v1",
+    "paths": {}
+}
