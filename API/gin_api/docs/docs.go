@@ -23,7 +23,97 @@ var doc = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/v1/kiosk/checksn/{sn}": {
+            "get": {
+                "description": "Wearable SN를 받아 사용하는 유저가 존재하는지 확인하는 기능",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "check Wearable SN",
+                "operationId": "userCheck",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Wearable Serial Number",
+                        "name": "sn",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/kiosk.kioskUserCheckModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/kiosk/welcome/{name}": {
+            "get": {
+                "description": "테스트용 작성후 삭제예정",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "kiosk working test",
+                "operationId": "hello",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/kiosk.welcomeModel"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "kiosk.kioskUserCheckModel": {
+            "type": "object",
+            "properties": {
+                "isuser": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "wearableSN": {
+                    "type": "string",
+                    "example": "wsn1111"
+                }
+            }
+        },
+        "kiosk.welcomeModel": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "account  name"
+                }
+            }
+        }
+    }
 }`
 
 type swaggerInfo struct {
@@ -38,8 +128,8 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "0.0.1",
-	Host:        "localhost",
-	BasePath:    "/api/v1",
+	Host:        "localhost:8080",
+	BasePath:    "/",
 	Schemes:     []string{},
 	Title:       "NFC API",
 	Description: "Hoseo NFC 2021 projct API Page",

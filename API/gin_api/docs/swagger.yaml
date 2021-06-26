@@ -1,9 +1,69 @@
-basePath: /api/v1
-host: localhost
+basePath: /
+definitions:
+  kiosk.kioskUserCheckModel:
+    properties:
+      isuser:
+        example: true
+        type: boolean
+      wearableSN:
+        example: wsn1111
+        type: string
+    type: object
+  kiosk.welcomeModel:
+    properties:
+      id:
+        example: 1
+        format: int64
+        type: integer
+      name:
+        example: account  name
+        type: string
+    type: object
+host: localhost:8080
 info:
   contact: {}
   description: Hoseo NFC 2021 projct API Page
   title: NFC API
   version: 0.0.1
-paths: {}
+paths:
+  /v1/kiosk/checksn/{sn}:
+    get:
+      consumes:
+      - application/json
+      description: Wearable SN를 받아 사용하는 유저가 존재하는지 확인하는 기능
+      operationId: userCheck
+      parameters:
+      - description: Wearable Serial Number
+        in: path
+        name: sn
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/kiosk.kioskUserCheckModel'
+      summary: check Wearable SN
+  /v1/kiosk/welcome/{name}:
+    get:
+      consumes:
+      - application/json
+      description: 테스트용 작성후 삭제예정
+      operationId: hello
+      parameters:
+      - description: User name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/kiosk.welcomeModel'
+      summary: kiosk working test
 swagger: "2.0"
