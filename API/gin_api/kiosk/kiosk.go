@@ -11,7 +11,7 @@ type welcomeModel struct {
 	Name string `json:"name" example:"account  name"`
 }
 
-type kioskUserCheckModel struct {
+type UserCheckModel struct {
 	WearableSN string `json:"wearableSN" example:"wsn1111"`
 	IsUser     bool   `json:"isuser" example:"true"`
 }
@@ -48,7 +48,8 @@ func CheckWearableSN(c *gin.Context) {
 	wearable := c.Param("sn")
 	user_stat := true
 
-	usercheckMessage := kioskUserCheckModel{wearable, user_stat}
+	usercheckMessage := UserCheckModel{wearable, user_stat}
 
 	c.JSON(http.StatusOK, gin.H{"message": usercheckMessage})
+
 }
