@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	_ "nfc_api/docs"
+	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
 
 	"github.com/gin-gonic/gin"
@@ -34,9 +35,20 @@ func setupRouter() *gin.Engine {
 
 		web_router := v1.Group("/web")
 		{
+			web_admin_router := web_router.Group("/admin")
+			{
 
+			}
 		}
 
+		app_router := v1.Group("/app")
+		{
+			app_admin_router := app_router.Group("/admin")
+			{
+
+			}
+
+		}
 	}
 
 	return r
@@ -44,6 +56,10 @@ func setupRouter() *gin.Engine {
 
 func main() {
 	r := setupRouter()
+
+	r.GET("/firebasetokencheck", func(c *gin.Context) {
+		firebaseauth.SetupFirebase()
+	})
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
