@@ -1,9 +1,9 @@
 package main
 
 import (
+	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	_ "nfc_api/docs"
-
 	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
 
@@ -32,6 +32,7 @@ func setupRouter() *gin.Engine {
 		{
 			kiosk_router.GET("/welcome/:name", kiosk.WelcomeApi)
 			kiosk_router.GET("/checksn/:sn", kiosk.CheckWearableSN)
+			//kiosk_router.GET("/wifi/:name",kiosk.CheckWifi)
 		}
 
 		//Common API
@@ -69,9 +70,12 @@ func setupRouter() *gin.Engine {
 	return r
 }
 
-func main() {
-	r := setupRouter()
 
+
+func main() {
+
+
+	r := setupRouter()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
