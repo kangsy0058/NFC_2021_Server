@@ -21,6 +21,17 @@ import (
 
 func setupRouter() *gin.Engine {
 	r := gin.Default()
+
+	// set gin Context
+	r.Use(func(c *gin.Context) {
+		// 함수 안에서 사용시
+		// firebaseAuth := c.MustGet("firebaseAuth").(*auth.Client)
+		c.Set("firebaseAuth", firebaseauth.SetupFirebase())
+	})
+
+	// global middleware setting
+	r.Use(CORSMiddleware())
+
 	//Swagger router
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -36,6 +47,7 @@ func setupRouter() *gin.Engine {
 
 		//Common API
 		commomn_router := v1.Group("/common")
+		commomn_router.Use(firebaseauth.FirebaseAuthMiddleware())
 		{
 			commomn_router.GET("/test", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
@@ -78,8 +90,23 @@ func main() {
 		})
 	})
 
-	r.GET("/tokentest", firebaseauth.TestFirebaseToken)
-	r.GET("/testid", firebaseauth.Testid)
-
 	r.Run()
+}
+
+// CORS 세팅용 middleware
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With, token")
+		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
 }
