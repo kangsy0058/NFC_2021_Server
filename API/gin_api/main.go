@@ -3,6 +3,7 @@ package main
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
+	"nfc_api/common"
 	_ "nfc_api/docs"
 	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
@@ -48,14 +49,36 @@ func setupRouter() *gin.Engine {
 
 		//Common API
 		commomn_router := v1.Group("/common")
-		commomn_router.Use(firebaseauth.FirebaseAuthMiddleware())
+		//commomn_router.Use(firebaseauth.FirebaseAuthMiddleware())
 		{
 			commomn_router.GET("/test", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
 					"message": "pong",
 				})
 			})
+
 		}
+		commomn_router.POST("/user/device-add",func(c *gin.Context){
+			c.JSON(http.StatusCreated, gin.H{
+				"rtmsg": "Success",
+			})
+		})
+		commomn_router.DELETE("/user/device-del",func(c *gin.Context){
+			c.JSON(http.StatusAccepted, gin.H{
+				"rtmsg": "Success",
+			})
+		})
+		commomn_router.POST("/user/pid-add",func(c *gin.Context){
+			c.JSON(http.StatusCreated, gin.H{
+				"rtmsg": "Success",
+			})
+		})
+		commomn_router.DELETE("/user/pid-del",func(c *gin.Context){
+			c.JSON(http.StatusAccepted, gin.H{
+				"rtmsg": "Success",
+			})
+		})
+		commomn_router.GET("/userlog/visitHistory", common.VisitHistory)
 
 		//kiosk_Admin API
 		kiosk_admin_router := v1.Group("/kioskadmin")
