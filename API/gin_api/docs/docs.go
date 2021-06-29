@@ -24,6 +24,36 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/common/visitHistory/{Wearable_SN}": {
+            "get": {
+                "description": "테스트용 작성후 삭제예정",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "app working test",
+                "operationId": "Wearable_SN",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Wearable_SN",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/common.UserLogModel"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/kiosk/checksn/{sn}": {
             "get": {
                 "description": "Wearable SN를 받아 사용하는 유저가 존재하는지 확인하는 기능",
@@ -48,7 +78,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/kiosk.kioskUserCheckModel"
+                            "$ref": "#/definitions/kiosk.UserCheckModel"
                         }
                     }
                 }
@@ -86,7 +116,32 @@ var doc = `{
         }
     },
     "definitions": {
-        "kiosk.kioskUserCheckModel": {
+        "common.UserLogModel": {
+            "type": "object",
+            "properties": {
+                "Date": {
+                    "type": "string",
+                    "example": "2021-06-30"
+                },
+                "IDX": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1
+                },
+                "Time": {
+                    "type": "string",
+                    "example": "15:30:30"
+                },
+                "building_name": {
+                    "type": "string"
+                },
+                "temp": {
+                    "type": "string",
+                    "example": "36.5"
+                }
+            }
+        },
+        "kiosk.UserCheckModel": {
             "type": "object",
             "properties": {
                 "isuser": {

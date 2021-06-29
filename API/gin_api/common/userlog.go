@@ -17,12 +17,12 @@ type UserLogModel struct {
 // @Summary app working test
 // @Description 테스트용 작성후 삭제예정
 // @Tag common
-// @id hello
+// @id Wearable_SN
 // @Accept  json
 // @Produce  json
 // @Param name path string true "Wearable_SN"
 // @Router /v1/common/visitHistory/{Wearable_SN} [get]
-// @Success 200 {object} welcomeModel
+// @Success 200 {object} UserLogModel
 func VisitHistory(c *gin.Context) {
 	IDX := 1
 	Time := "15:30:15"

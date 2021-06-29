@@ -45,7 +45,7 @@ func WelcomeApi(c *gin.Context) {
 // @Produce  json
 // @Param sn path string true "Wearable Serial Number"
 // @Router /v1/kiosk/checksn/{sn} [get]
-// @Success 200 {object} kioskUserCheckModel
+// @Success 200 {object} UserCheckModel
 func CheckWearableSN(c *gin.Context) {
 	wearable := c.Param("sn")
 	user_stat := true
