@@ -4,6 +4,7 @@ import (
 	"net/http"
 	_ "nfc_api/docs"
 
+	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
 
 	"github.com/gin-gonic/gin"
@@ -32,28 +33,37 @@ func setupRouter() *gin.Engine {
 			kiosk_router.GET("/welcome/:name", kiosk.WelcomeApi)
 			kiosk_router.GET("/checksn/:sn", kiosk.CheckWearableSN)
 		}
-		// Web API
-		web_router := v1.Group("/web")
-		{
-			web_admin_router := web_router.Group("/admin")
-			{
-				web_admin_router.GET("/test", func(c *gin.Context) {
-					c.JSON(http.StatusOK, gin.H{"hello": "admin_test"})
-				})
-			}
-		}
-		// App API
-		app_router := v1.Group("/app")
-		{
-			app_admin_router := app_router.Group("/admin")
-			{
-				
-				app_admin_router.GET("/test", func(c *gin.Context) {
-					c.JSON(http.StatusOK, gin.H{"hello": "app_test"})
-				})
-			}
 
+		//Common API
+		commomn_router := v1.Group("/common")
+		{
+			commomn_router.GET("/test", func(c *gin.Context) {
+				c.JSON(http.StatusOK, gin.H{
+					"message": "pong",
+				})
+			})
 		}
+
+		//kiosk_Admin API
+		kiosk_admin_router := v1.Group("/kioskadmin")
+		{
+			kiosk_admin_router.GET("/test", func(c *gin.Context) {
+				c.JSON(http.StatusOK, gin.H{
+					"message": "pong",
+				})
+			})
+		}
+
+		//userlog_Admin API
+		user_admin_router := v1.Group("/useradmin")
+		{
+			user_admin_router.GET("/test", func(c *gin.Context) {
+				c.JSON(http.StatusOK, gin.H{
+					"message": "pong",
+				})
+			})
+		}
+
 	}
 
 	return r
@@ -67,5 +77,9 @@ func main() {
 			"message": "pong",
 		})
 	})
+
+	r.GET("/tokentest", firebaseauth.TestFirebaseToken)
+	r.GET("/testid", firebaseauth.Testid)
+
 	r.Run()
 }
