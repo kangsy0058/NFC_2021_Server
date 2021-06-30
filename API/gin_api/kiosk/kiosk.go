@@ -20,7 +20,6 @@ type UserCheckModel struct {
 // @Summary kiosk working test
 // @Description 테스트용 작성후 삭제예정
 // @id hello
-// @Tags Kiosk
 // @name get-string-by-int
 // @Accept  json
 // @Produce  json
@@ -39,13 +38,12 @@ func WelcomeApi(c *gin.Context) {
 // @Summary check Wearable SN
 // @Description Wearable SN를 받아 사용하는 유저가 존재하는지 확인하는 기능
 // @id userCheck
-// @Tags Kiosk
 // @name get-string-by-int
 // @Accept  json
 // @Produce  json
 // @Param sn path string true "Wearable Serial Number"
 // @Router /v1/kiosk/checksn/{sn} [get]
-// @Success 200 {object} UserCheckModel
+// @Success 200 {object} kioskUserCheckModel
 func CheckWearableSN(c *gin.Context) {
 	wearable := c.Param("sn")
 	user_stat := true

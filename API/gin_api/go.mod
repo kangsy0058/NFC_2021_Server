@@ -3,15 +3,16 @@ module nfc_api
 go 1.16
 
 require (
+	cloud.google.com/go/firestore v1.5.0 // indirect
 	cloud.google.com/go/storage v1.15.0 // indirect
-	firebase.google.com/go/v4 v4.6.0
+	firebase.google.com/go v3.13.0+incompatible
+	firebase.google.com/go/v4 v4.6.0 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/gin-gonic/gin v1.7.2
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.3 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/go-playground/validator/v10 v10.6.1 // indirect
-	github.com/jinzhu/gorm v1.9.16 // indirect
 	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
