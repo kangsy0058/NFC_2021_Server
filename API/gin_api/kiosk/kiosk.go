@@ -19,6 +19,7 @@ type UserCheckModel struct {
 // Welcome godoc
 // @Summary kiosk working test
 // @Description 테스트용 작성후 삭제예정
+// @Tag Kiosk
 // @id hello
 // @name get-string-by-int
 // @Accept  json
@@ -37,6 +38,7 @@ func WelcomeApi(c *gin.Context) {
 // Weaable check godoc
 // @Summary check Wearable SN
 // @Description Wearable SN를 받아 사용하는 유저가 존재하는지 확인하는 기능
+// @Tag Kiosk
 // @id userCheck
 // @name get-string-by-int
 // @Accept  json
@@ -53,3 +55,5 @@ func CheckWearableSN(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": usercheckMessage})
 
 }
+
+
