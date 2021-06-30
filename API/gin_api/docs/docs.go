@@ -33,6 +33,9 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Kiosk"
+                ],
                 "summary": "check Wearable SN",
                 "operationId": "userCheck",
                 "parameters": [
@@ -48,7 +51,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/kiosk.kioskUserCheckModel"
+                            "$ref": "#/definitions/kiosk.UserCheckModel"
                         }
                     }
                 }
@@ -62,6 +65,9 @@ var doc = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Kiosk"
                 ],
                 "summary": "kiosk working test",
                 "operationId": "hello",
@@ -86,7 +92,7 @@ var doc = `{
         }
     },
     "definitions": {
-        "kiosk.kioskUserCheckModel": {
+        "kiosk.UserCheckModel": {
             "type": "object",
             "properties": {
                 "isuser": {

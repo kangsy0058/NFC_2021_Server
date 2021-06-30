@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  kiosk.kioskUserCheckModel:
+  kiosk.UserCheckModel:
     properties:
       isuser:
         example: true
@@ -44,8 +44,10 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/kiosk.kioskUserCheckModel'
+            $ref: '#/definitions/kiosk.UserCheckModel'
       summary: check Wearable SN
+      tags:
+      - Kiosk
   /v1/kiosk/welcome/{name}:
     get:
       consumes:
@@ -66,4 +68,6 @@ paths:
           schema:
             $ref: '#/definitions/kiosk.welcomeModel'
       summary: kiosk working test
+      tags:
+      - Kiosk
 swagger: "2.0"
