@@ -13,6 +13,8 @@ type UserLogModel struct {
 	BuildingName string `json:"building_name" exmaple:"Hoseo"`
 }
 
+
+
 // Welcome godoc
 // @Summary app working test
 // @Description 테스트용 작성후 삭제예정
@@ -33,3 +35,4 @@ func VisitHistory(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"User_log": responseMessage})
 }
+

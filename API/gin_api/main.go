@@ -48,8 +48,9 @@ func setupRouter() *gin.Engine {
 		}
 
 		//Common API
+		//app
 		commomn_router := v1.Group("/common")
-		//commomn_router.Use(firebaseauth.FirebaseAuthMiddleware())
+		commomn_router.Use(firebaseauth.FirebaseAuthMiddleware())
 		{
 			commomn_router.GET("/test", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
@@ -60,6 +61,7 @@ func setupRouter() *gin.Engine {
 		}
 		commomn_router.POST("/user/device-add",func(c *gin.Context){
 			c.JSON(http.StatusCreated, gin.H{
+				"rt" : http.StatusCreated,
 				"rtmsg": "Success",
 			})
 		})
@@ -79,6 +81,21 @@ func setupRouter() *gin.Engine {
 			})
 		})
 		commomn_router.GET("/userlog/visitHistory", common.VisitHistory)
+		commomn_router.POST("/user/FBToken",func(c *gin.Context){
+			c.JSON(http.StatusCreated, gin.H{
+				"rtmsg": "Success",
+			})
+		})
+		commomn_router.GET("/user/userInfo", common.UserInfo)
+		commomn_router.POST("/user/change",func(c *gin.Context){
+			c.JSON(http.StatusCreated, gin.H{
+				"rtmsg": "Success",
+			})
+		})
+
+		//web
+		commomn_router.GET("/user/login",common.UserLogin)
+
 
 		//kiosk_Admin API
 		kiosk_admin_router := v1.Group("/kioskadmin")
@@ -96,10 +113,14 @@ func setupRouter() *gin.Engine {
 			user_admin_router.GET("/test", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
 					"message": "pong",
+					"code":http.StatusOK,
 				})
 			})
 		}
 
+		//web
+		user_admin_router.GET("/subgroup/lookup",common.SubGroupLookup)
+		user_admin_router.GET("/subgroup/device/lookup/all",common.)
 	}
 
 	return r
