@@ -50,7 +50,7 @@ func setupRouter() *gin.Engine {
 		//Common API
 		//app
 		commomn_router := v1.Group("/common")
-		commomn_router.Use(firebaseauth.FirebaseAuthMiddleware())
+		//commomn_router.Use(firebaseauth.FirebaseAuthMiddleware())
 		{
 			commomn_router.GET("/test", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
@@ -116,11 +116,12 @@ func setupRouter() *gin.Engine {
 					"code":http.StatusOK,
 				})
 			})
+			//web
+			user_admin_router.GET("/subgroup/lookup",common.SubGroupLookup)
+			//user_admin_router.GET("/subgroup/device/lookup/all",common.)
 		}
 
-		//web
-		user_admin_router.GET("/subgroup/lookup",common.SubGroupLookup)
-		user_admin_router.GET("/subgroup/device/lookup/all",common.)
+
 	}
 
 	return r

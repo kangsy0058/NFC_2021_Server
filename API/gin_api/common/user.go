@@ -29,9 +29,9 @@ type GroupListModel struct {
 	GroupName string `json:"Group_Name" example:"그룹1"`
 	Address string `json:"Address" example:"경기도 화성시 17-1"`
 }
-type SubGroupDeviceModel struct {
-	GroupCode
-}
+//type SubGroupDeviceModel struct {
+//	GroupCode
+//}
 
 
 
@@ -55,6 +55,7 @@ func UserLogin(c *gin.Context)  {
 	c.JSON(http.StatusOK, gin.H{
 		"rt" : http.StatusOK,
 		"data":responseMessage})
+	c.Abort()
 }
 
 
@@ -68,12 +69,16 @@ func SubGroupLookup(c *gin.Context)  {
 	PSN_img := "C:Users사용자이름PicturesMyImg1.jpg"
 	Is_Admin := 0
 	WearableSN := "wsn1111"
+	GroupCode := "0001"
+	GroupName := "그룹1"
+	Address := "경기도 화성서 17-1"
 
 	responseSubGroup := UserSubGroupModel{UUID, Email, DisplayName, Token, PSN, PSN_img, Is_Admin, WearableSN}
-	//responseGroupList := GroupListModel{GroupCode: "0001", GroupName: "그룹1", Address: "경기도 화성서 17-1"}
+	responseGroupList := GroupListModel{GroupCode,GroupName,Address}
 	c.JSON(http.StatusOK, gin.H{
-		"rt" : http.StatusOK,
-		"data" : responseSubGroup, /*responseGroupList*/
+		"subGroup" : responseSubGroup,
+		"GroupList" : responseGroupList,
+		//"rt" : http.StatusOK,
 		})
 
 }
