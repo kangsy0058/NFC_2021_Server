@@ -42,9 +42,9 @@ func setupRouter() *gin.Engine {
 		// Kiosk API
 		kiosk_router := v1.Group("/kiosk")
 		{
-			kiosk_router.GET("/welcome/:name", kiosk.WelcomeApi)
-			kiosk_router.GET("/checksn/:sn", kiosk.CheckWearableSN)
-			//kiosk_router.GET("/wifi/:name",kiosk.CheckWifi)
+			kiosk_router.GET("/sncheck", kiosk.CheckWearableSN)
+			kiosk_router.GET("/userlog", kiosk.PutUserlog)
+
 		}
 
 		//Common API
@@ -118,7 +118,8 @@ func setupRouter() *gin.Engine {
 			})
 			//web
 			user_admin_router.GET("/subgroup/lookup",common.SubGroupLookup)
-			//user_admin_router.GET("/subgroup/device/lookup/all",common.)
+			user_admin_router.GET("/subgroup/device/lookup/all",common.DeviceGroupLookUp)
+			user_admin_router.GET("/subgroup/device/lookup/group",common.DeviceGroupLookUp)
 		}
 
 
