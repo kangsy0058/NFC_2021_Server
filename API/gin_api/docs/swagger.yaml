@@ -1,6 +1,24 @@
 basePath: /
 definitions:
-  kiosk.kioskUserCheckModel:
+  common.UserLogModel:
+    properties:
+      Date:
+        example: "2021-06-30"
+        type: string
+      IDX:
+        example: 1
+        format: int64
+        type: integer
+      Time:
+        example: "15:30:30"
+        type: string
+      building_name:
+        type: string
+      temp:
+        example: "36.5"
+        type: string
+    type: object
+  kiosk.UserCheckModel:
     properties:
       isuser:
         example: true
@@ -26,6 +44,26 @@ info:
   title: NFC API
   version: 0.0.1
 paths:
+  /v1/common/visitHistory/{Wearable_SN}:
+    get:
+      consumes:
+      - application/json
+      description: 테스트용 작성후 삭제예정
+      operationId: Wearable_SN
+      parameters:
+      - description: Wearable_SN
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.UserLogModel'
+      summary: app working test
   /v1/kiosk/checksn/{sn}:
     get:
       consumes:
@@ -44,7 +82,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/kiosk.kioskUserCheckModel'
+            $ref: '#/definitions/kiosk.UserCheckModel'
       summary: check Wearable SN
   /v1/kiosk/welcome/{name}:
     get:
