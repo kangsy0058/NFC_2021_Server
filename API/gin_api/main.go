@@ -1,11 +1,13 @@
 package main
 
 import (
-	_ "github.com/go-sql-driver/mysql"
 	"net/http"
+	"nfc_api/database"
 	_ "nfc_api/docs"
 	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
+
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -67,10 +69,10 @@ func setupRouter() *gin.Engine {
 			})
 		}
 
-		//userlog_Admin API
-		user_admin_router := v1.Group("/useradmin")
+		//top_Admin API
+		admin_router := v1.Group("/admin")
 		{
-			user_admin_router.GET("/test", func(c *gin.Context) {
+			admin_router.GET("/test", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
 					"message": "pong",
 				})
@@ -82,17 +84,13 @@ func setupRouter() *gin.Engine {
 	return r
 }
 
-
-
 func main() {
-
-
 	r := setupRouter()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+
+	db := database.DatabsaeSetup()
+
+	var userdb database.User_info
+	res := db.First(&userdb)
 
 	r.Run()
 }
