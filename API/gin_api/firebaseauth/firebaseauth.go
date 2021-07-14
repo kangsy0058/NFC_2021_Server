@@ -58,3 +58,22 @@ func FirebaseAuthMiddleware() gin.HandlerFunc {
 }
 
 // admin API 요청시 중간에서 firebase Id token과 admin권한을 확인하는 middleware
+func FirebaseAuthAdminMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.Request.Header.Get("token")
+		firebaseAuth := c.MustGet("firebaseAuth").(*auth.Client)
+
+		// firebase 토큰 확인
+		restoken, err := firebaseAuth.VerifyIDToken(context.Background(), token)
+		// 토큰값이 이상하다면
+		if err != nil {
+			// Forbiddem status return 후 종료
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+		// 토큰 확인 완료시 진행
+		// token := c.MustGet("token").(*auth.Token)
+		c.Set("token", restoken)
+		c.Next()
+	}
+}
