@@ -1,16 +1,20 @@
 package kiosk
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
+	"time"
 )
 
-//type welcomeModel struct {
-//	ID   int    `json:"id" example:"1" format:"int64"`
-//	Name string `json:"name" example:"account  name"`
-//}
-//
+type UserLogModel struct {
+	KioskSN    string   `json:"Kiosk_SN" exmaple:"KSN1111"`
+	WearableSN string   `json:"Wearable_SN" example:"wsn1111"`
+	Time       time.Time `json:"time" example:"03:14:18" foramt:"time"`
+	Date       time.Time`json:"date" example:"2021-05-16"`
+	Temp       float64  `json:"temp" example:"36.5" format:"float64"`
+}
+
 //type UserCheckModel struct {
 //	WearableSN string `json:"wearableSN" example:"wsn1111"`
 //	IsUser     bool   `json:"isuser" example:"true"`
@@ -29,21 +33,21 @@ import (
 // @Router /v1/kiosk/checksn/{sn} [get]
 // @Success 200 {object} UserCheckModel
 func CheckWearableSN(c *gin.Context) {
-	//SN := c.Param("KioskSN")
+	KioskSN := c.Query("KioskSN")
 	user_stat := true
-	//if err := c.ShouldBindJSON(&SN); err !=nil{
-	//	c.JSON(http.StatusBadRequest,gin.H{
-	//		"rt": 400,
-	//		"response": "Parameter Check",
-	//	})
-	//
-	//	log.Print(err.Error())
-	//
-	//	return
-	//}
-	usercheckMessage :=  user_stat
+	if KioskSN == ""{
+		c.JSON(http.StatusBadRequest,gin.H{
+			"rt": http.StatusBadRequest,
+			"response": "Parameter Check",
+		})
 
-	c.JSON(http.StatusOK, gin.H{"response": usercheckMessage})
+		log.Print("Parameter Null")
+
+		return
+	}
+	response := user_stat
+
+	c.JSON(http.StatusOK, gin.H{"response": response})
 
 }
 
@@ -62,9 +66,14 @@ func PutUserlog(c *gin.Context) {
 	//name := c.Param("name")
 	//message := name + " is very handsome"
 	//welcomeMessage := welcomeModel{1, message}
+	KioskSN := c.Query("KioskSN")
+	WearableSN := c.Query("WearableSN")
+	Time := c.GetTime("Time")
+	Date := c.GetTime("date")
+	Temp := c.GetFloat64("temp")
+	response := UserLogModel{KioskSN,WearableSN,Time,Date, Temp}
 
-
-	c.JSON(http.StatusCreated, gin.H{"response": true})
+	c.JSON(http.StatusCreated, gin.H{"response": response})
 }
 
 

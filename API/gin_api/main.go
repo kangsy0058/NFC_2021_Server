@@ -42,8 +42,8 @@ func setupRouter() *gin.Engine {
 		// Kiosk API
 		kiosk_router := v1.Group("/kiosk")
 		{
-			kiosk_router.GET("/sncheck", kiosk.CheckWearableSN)
-			kiosk_router.GET("/userlog", kiosk.PutUserlog)
+			kiosk_router.GET("/sncheck/", kiosk.CheckWearableSN)
+			kiosk_router.PUT("/userlog", kiosk.PutUserlog)
 
 		}
 
@@ -131,6 +131,7 @@ func setupRouter() *gin.Engine {
 
 
 func main() {
+
 
 
 	r := setupRouter()
