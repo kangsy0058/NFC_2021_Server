@@ -1,12 +1,13 @@
 package main
 
 import (
-	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	"nfc_api/common"
 	_ "nfc_api/docs"
 	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
+
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -42,8 +43,8 @@ func setupRouter() *gin.Engine {
 		// Kiosk API
 		kiosk_router := v1.Group("/kiosk")
 		{
-			kiosk_router.GET("/sncheck", kiosk.CheckWearableSN)
-			kiosk_router.GET("/userlog", kiosk.PutUserlog)
+			kiosk_router.GET("/sncheck/:werableSN", kiosk.CheckWearableSN)
+			kiosk_router.POST("/userlog", kiosk.Userlog)
 
 		}
 
@@ -59,43 +60,42 @@ func setupRouter() *gin.Engine {
 			})
 
 		}
-		commomn_router.POST("/user/device-add",func(c *gin.Context){
+		commomn_router.POST("/user/device-add", func(c *gin.Context) {
 			c.JSON(http.StatusCreated, gin.H{
-				"rt" : http.StatusCreated,
+				"rt":    http.StatusCreated,
 				"rtmsg": "Success",
 			})
 		})
-		commomn_router.DELETE("/user/device-del",func(c *gin.Context){
+		commomn_router.DELETE("/user/device-del", func(c *gin.Context) {
 			c.JSON(http.StatusAccepted, gin.H{
 				"rtmsg": "Success",
 			})
 		})
-		commomn_router.POST("/user/pid-add",func(c *gin.Context){
+		commomn_router.POST("/user/pid-add", func(c *gin.Context) {
 			c.JSON(http.StatusCreated, gin.H{
 				"rtmsg": "Success",
 			})
 		})
-		commomn_router.DELETE("/user/pid-del",func(c *gin.Context){
+		commomn_router.DELETE("/user/pid-del", func(c *gin.Context) {
 			c.JSON(http.StatusAccepted, gin.H{
 				"rtmsg": "Success",
 			})
 		})
 		commomn_router.GET("/userlog/visitHistory", common.VisitHistory)
-		commomn_router.POST("/user/FBToken",func(c *gin.Context){
+		commomn_router.POST("/user/FBToken", func(c *gin.Context) {
 			c.JSON(http.StatusCreated, gin.H{
 				"rtmsg": "Success",
 			})
 		})
 		commomn_router.GET("/user/userInfo", common.UserInfo)
-		commomn_router.POST("/user/change",func(c *gin.Context){
+		commomn_router.POST("/user/change", func(c *gin.Context) {
 			c.JSON(http.StatusCreated, gin.H{
 				"rtmsg": "Success",
 			})
 		})
 
 		//web
-		commomn_router.GET("/user/login",common.UserLogin)
-
+		commomn_router.GET("/user/login", common.UserLogin)
 
 		//kiosk_Admin API
 		kiosk_admin_router := v1.Group("/kioskadmin")
@@ -113,33 +113,22 @@ func setupRouter() *gin.Engine {
 			user_admin_router.GET("/test", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
 					"message": "pong",
-					"code":http.StatusOK,
+					"code":    http.StatusOK,
 				})
 			})
 			//web
-			user_admin_router.GET("/subgroup/lookup",common.SubGroupLookup)
-			user_admin_router.GET("/subgroup/device/lookup/all",common.DeviceGroupLookUp)
-			user_admin_router.GET("/subgroup/device/lookup/group",common.DeviceGroupLookUp)
+			user_admin_router.GET("/subgroup/lookup", common.SubGroupLookup)
+			user_admin_router.GET("/subgroup/device/lookup/all", common.DeviceGroupLookUp)
+			user_admin_router.GET("/subgroup/device/lookup/group", common.DeviceGroupLookUp)
 		}
-
-
 	}
-
 	return r
 }
 
-
-
 func main() {
-
-
+	// Router setup
 	r := setupRouter()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
+	//Server start
 	r.Run()
 }
 
@@ -150,7 +139,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Credentials", "true")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With, token")
-		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+		c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS, GET, PUT")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)

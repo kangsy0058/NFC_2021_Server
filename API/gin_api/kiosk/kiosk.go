@@ -2,6 +2,8 @@ package kiosk
 
 import (
 	"net/http"
+	"nfc_api/database"
+	"nfc_api/redisinit"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,12 +12,11 @@ import (
 //	ID   int    `json:"id" example:"1" format:"int64"`
 //	Name string `json:"name" example:"account  name"`
 //}
-//
-//type UserCheckModel struct {
-//	WearableSN string `json:"wearableSN" example:"wsn1111"`
-//	IsUser     bool   `json:"isuser" example:"true"`
-//}
 
+type UserCheckModel struct {
+	WearableSN string `json:"wearableSN" example:"wsn1111"`
+	IsUser     bool   `json:"isuser" example:"true"`
+}
 
 // Weaable check godoc
 // @Summary check Wearable SN
@@ -26,25 +27,46 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param sn path string true "Wearable Serial Number"
-// @Router /v1/kiosk/checksn/{sn} [get]
+// @Router /v1/kiosk/checksn/{wearableSN} [get]
 // @Success 200 {object} UserCheckModel
 func CheckWearableSN(c *gin.Context) {
-	//SN := c.Param("KioskSN")
-	user_stat := true
-	//if err := c.ShouldBindJSON(&SN); err !=nil{
-	//	c.JSON(http.StatusBadRequest,gin.H{
-	//		"rt": 400,
-	//		"response": "Parameter Check",
-	//	})
-	//
-	//	log.Print(err.Error())
-	//
-	//	return
-	//}
-	usercheckMessage :=  user_stat
+	SN := c.Param("werableSN")
 
-	c.JSON(http.StatusOK, gin.H{"response": usercheckMessage})
+	// return model에 sn 값 추가
+	usercheck := UserCheckModel{WearableSN: SN}
 
+	//find status in cache
+	status, err := redisinit.GetUserData(SN)
+	if err != nil {
+		//cache에 데이터가 없는경우 db 확인
+		db, err := database.Mariadb()
+		if err != nil {
+			// can't connect database return status code 500
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		defer db.Close()
+
+		// 결과값용 변수 필요하지만 사용하지않음
+		var res string
+		// DB에서 데이터 확인후 cache에 저장한후 다음과정 진행
+		err = db.QueryRow("SELECT UUID FROM user_info WHERE wearable_SN = ?", SN).Scan(&res)
+		if err != nil {
+			status = "false"
+		} else {
+			status = "true"
+		}
+		// 결과 cache에 저장
+		redisinit.SetUserData(SN, status)
+	}
+
+	// status check  "true" is user "false" is not user
+	if status == "true" {
+		usercheck.IsUser = true
+	} else if status == "false" {
+		usercheck.IsUser = false
+	}
+	c.JSON(http.StatusOK, gin.H{"res": usercheck})
 }
 
 // Welcome godoc
@@ -58,13 +80,10 @@ func CheckWearableSN(c *gin.Context) {
 // @Param name path string true "User name"
 // @Router /v1/kiosk/welcome/{name} [get]
 // @Success 200 {object} welcomeModel
-func PutUserlog(c *gin.Context) {
+func Userlog(c *gin.Context) {
 	//name := c.Param("name")
 	//message := name + " is very handsome"
 	//welcomeMessage := welcomeModel{1, message}
 
-
 	c.JSON(http.StatusCreated, gin.H{"response": true})
 }
-
-
