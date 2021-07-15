@@ -1,9 +1,12 @@
 package common
 
 import (
+	"database/sql"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
+
 
 type UserInfoModel struct {
 	PSN          string     `json:"PSN" example:"12가34나" `
@@ -38,7 +41,16 @@ type GroupDeviceModel struct {
 	Longtitude float64 `json:"Longtitude" example:"127.074"`
 }
 
-
+func db()  {
+	db, err := sql.Open("mysql", "root:hoseolab420@tcp(210.119.104.207:3306)/hoseo")
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
+	var version string
+	db.QueryRow("SELECT VERSION()").Scan(&version)
+	fmt.Println("Connected to:", version)
+}
 
 func UserInfo(c *gin.Context) {
 	PSN := "12가34나"
@@ -99,5 +111,23 @@ func DeviceGroupLookUp(c *gin.Context)  {
 	responseMessage := GroupDeviceModel{GroupCode, KioskSN, DetailPosition,BuildingName, Latitude, Longtitude}
 	c.JSON(http.StatusOK, gin.H{
 		"data" : responseMessage,
+	})
+}
+
+func DevcieGroupAdd(c *gin.Context){
+	c.JSON(http.StatusCreated, gin.H{
+		"rtmsg":"Success",
+	})
+}
+
+func DeviceGroupDel(c *gin.Context)  {
+	c.JSON(http.StatusAccepted, gin.H{
+		"rtmsg":"Success",
+	})
+}
+
+func GroupAuthAdd(c *gin.Context){
+	c.JSON(http.StatusCreated, gin.H{
+		"rtmsg":"Success",
 	})
 }

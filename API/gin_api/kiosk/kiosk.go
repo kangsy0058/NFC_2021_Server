@@ -1,16 +1,36 @@
 package kiosk
 
 import (
+<<<<<<< HEAD
 	"net/http"
 	"nfc_api/database"
 	"nfc_api/redisinit"
 
+=======
+>>>>>>> Haeil
 	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
+	"time"
 )
 
+<<<<<<< HEAD
 //type welcomeModel struct {
 //	ID   int    `json:"id" example:"1" format:"int64"`
 //	Name string `json:"name" example:"account  name"`
+=======
+type UserLogModel struct {
+	KioskSN    string   `json:"Kiosk_SN" exmaple:"KSN1111"`
+	WearableSN string   `json:"Wearable_SN" example:"wsn1111"`
+	Time       time.Time `json:"time" example:"03:14:18" foramt:"time"`
+	Date       time.Time`json:"date" example:"2021-05-16"`
+	Temp       float64  `json:"temp" example:"36.5" format:"float64"`
+}
+
+//type UserCheckModel struct {
+//	WearableSN string `json:"wearableSN" example:"wsn1111"`
+//	IsUser     bool   `json:"isuser" example:"true"`
+>>>>>>> Haeil
 //}
 
 type UserCheckModel struct {
@@ -30,6 +50,7 @@ type UserCheckModel struct {
 // @Router /v1/kiosk/checksn/{wearableSN} [get]
 // @Success 200 {object} UserCheckModel
 func CheckWearableSN(c *gin.Context) {
+<<<<<<< HEAD
 	SN := c.Param("werableSN")
 
 	// return model에 sn 값 추가
@@ -59,6 +80,23 @@ func CheckWearableSN(c *gin.Context) {
 		// 결과 cache에 저장
 		redisinit.SetUserData(SN, status)
 	}
+=======
+	KioskSN := c.Query("KioskSN")
+	user_stat := true
+	if KioskSN == ""{
+		c.JSON(http.StatusBadRequest,gin.H{
+			"rt": http.StatusBadRequest,
+			"response": "Parameter Check",
+		})
+
+		log.Print("Parameter Null")
+
+		return
+	}
+	response := user_stat
+
+	c.JSON(http.StatusOK, gin.H{"response": response})
+>>>>>>> Haeil
 
 	// status check  "true" is user "false" is not user
 	if status == "true" {
@@ -84,6 +122,16 @@ func Userlog(c *gin.Context) {
 	//name := c.Param("name")
 	//message := name + " is very handsome"
 	//welcomeMessage := welcomeModel{1, message}
+	KioskSN := c.Query("KioskSN")
+	WearableSN := c.Query("WearableSN")
+	Time := c.GetTime("Time")
+	Date := c.GetTime("date")
+	Temp := c.GetFloat64("temp")
+	response := UserLogModel{KioskSN,WearableSN,Time,Date, Temp}
 
+<<<<<<< HEAD
 	c.JSON(http.StatusCreated, gin.H{"response": true})
+=======
+	c.JSON(http.StatusCreated, gin.H{"response": response})
+>>>>>>> Haeil
 }
