@@ -1,27 +1,17 @@
 package main
 
 import (
-<<<<<<< HEAD
-=======
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
->>>>>>> Haeil
 	"net/http"
 	"nfc_api/common"
+	"nfc_api/database"
 	_ "nfc_api/docs"
 	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
-<<<<<<< HEAD
-
-	_ "github.com/go-sql-driver/mysql"
-
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
-=======
->>>>>>> Haeil
 )
 
 // @title NFC API
@@ -133,16 +123,26 @@ func setupRouter() *gin.Engine {
 			user_admin_router.POST("/subgroup/device/add",common.DevcieGroupAdd)
 			user_admin_router.DELETE("/subgroup/device/del",common.DeviceGroupDel)
 			user_admin_router.POST("/subgroup/authadd",common.GroupAuthAdd)
+			// 작업중 user_admin_router.GET("/account/lookup")
+			user_admin_router.DELETE("/account/del",common.AdminAccounthDel)
+			user_admin_router.POST("/account/post",common.AdminAccountPost)
 		}
 	}
 	return r
 }
 
 func main() {
+	//DB Connection Check
+	var version string
+	db, _ := database.Mariadb()
+	db.QueryRow("SELECT VERSION()").Scan(&version)
+	fmt.Println("Connected to:", version)
 	// Router setup
 	r := setupRouter()
 	//Server start
 	r.Run()
+
+
 }
 
 // CORS 세팅용 middleware

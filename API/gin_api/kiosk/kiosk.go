@@ -1,24 +1,16 @@
 package kiosk
 
 import (
-<<<<<<< HEAD
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"nfc_api/database"
 	"nfc_api/redisinit"
-
-=======
->>>>>>> Haeil
-	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
 	"time"
 )
 
-<<<<<<< HEAD
 //type welcomeModel struct {
 //	ID   int    `json:"id" example:"1" format:"int64"`
 //	Name string `json:"name" example:"account  name"`
-=======
 type UserLogModel struct {
 	KioskSN    string   `json:"Kiosk_SN" exmaple:"KSN1111"`
 	WearableSN string   `json:"Wearable_SN" example:"wsn1111"`
@@ -27,11 +19,6 @@ type UserLogModel struct {
 	Temp       float64  `json:"temp" example:"36.5" format:"float64"`
 }
 
-//type UserCheckModel struct {
-//	WearableSN string `json:"wearableSN" example:"wsn1111"`
-//	IsUser     bool   `json:"isuser" example:"true"`
->>>>>>> Haeil
-//}
 
 type UserCheckModel struct {
 	WearableSN string `json:"wearableSN" example:"wsn1111"`
