@@ -50,7 +50,6 @@ type UserCheckModel struct {
 // @Router /v1/kiosk/checksn/{wearableSN} [get]
 // @Success 200 {object} UserCheckModel
 func CheckWearableSN(c *gin.Context) {
-<<<<<<< HEAD
 	SN := c.Param("werableSN")
 
 	// return model에 sn 값 추가
@@ -80,23 +79,6 @@ func CheckWearableSN(c *gin.Context) {
 		// 결과 cache에 저장
 		redisinit.SetUserData(SN, status)
 	}
-=======
-	KioskSN := c.Query("KioskSN")
-	user_stat := true
-	if KioskSN == ""{
-		c.JSON(http.StatusBadRequest,gin.H{
-			"rt": http.StatusBadRequest,
-			"response": "Parameter Check",
-		})
-
-		log.Print("Parameter Null")
-
-		return
-	}
-	response := user_stat
-
-	c.JSON(http.StatusOK, gin.H{"response": response})
->>>>>>> Haeil
 
 	// status check  "true" is user "false" is not user
 	if status == "true" {
@@ -129,9 +111,5 @@ func Userlog(c *gin.Context) {
 	Temp := c.GetFloat64("temp")
 	response := UserLogModel{KioskSN,WearableSN,Time,Date, Temp}
 
-<<<<<<< HEAD
-	c.JSON(http.StatusCreated, gin.H{"response": true})
-=======
 	c.JSON(http.StatusCreated, gin.H{"response": response})
->>>>>>> Haeil
 }

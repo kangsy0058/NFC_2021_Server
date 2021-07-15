@@ -53,13 +53,8 @@ func setupRouter() *gin.Engine {
 		// Kiosk API
 		kiosk_router := v1.Group("/kiosk")
 		{
-<<<<<<< HEAD
 			kiosk_router.GET("/sncheck/:werableSN", kiosk.CheckWearableSN)
 			kiosk_router.POST("/userlog", kiosk.Userlog)
-=======
-			kiosk_router.GET("/sncheck/", kiosk.CheckWearableSN)
-			kiosk_router.PUT("/userlog", kiosk.PutUserlog)
->>>>>>> Haeil
 
 		}
 
@@ -132,31 +127,19 @@ func setupRouter() *gin.Engine {
 				})
 			})
 			//web
-<<<<<<< HEAD
-			user_admin_router.GET("/subgroup/lookup", common.SubGroupLookup)
-			user_admin_router.GET("/subgroup/device/lookup/all", common.DeviceGroupLookUp)
-			user_admin_router.GET("/subgroup/device/lookup/group", common.DeviceGroupLookUp)
-=======
 			user_admin_router.GET("/subgroup/lookup",common.SubGroupLookup)
 			user_admin_router.GET("/subgroup/device/lookup/all",common.DeviceGroupLookUp)
 			user_admin_router.GET("/subgroup/device/lookup/group",common.DeviceGroupLookUp)
 			user_admin_router.POST("/subgroup/device/add",common.DevcieGroupAdd)
 			user_admin_router.DELETE("/subgroup/device/del",common.DeviceGroupDel)
 			user_admin_router.POST("/subgroup/authadd",common.GroupAuthAdd)
->>>>>>> Haeil
 		}
 	}
 	return r
 }
 
 func main() {
-<<<<<<< HEAD
 	// Router setup
-=======
-
-
-
->>>>>>> Haeil
 	r := setupRouter()
 	//Server start
 	r.Run()
