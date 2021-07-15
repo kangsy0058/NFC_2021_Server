@@ -1,22 +1,38 @@
 package main
 
 import (
+<<<<<<< HEAD
 	"fmt"
 	"log"
+=======
+<<<<<<< HEAD
+=======
+	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+>>>>>>> Haeil
+>>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 	"net/http"
 	"nfc_api/common"
 	_ "nfc_api/docs"
 	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
+<<<<<<< HEAD
 	"time"
 
 	"database/sql"
+=======
+<<<<<<< HEAD
+>>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+=======
+>>>>>>> Haeil
 )
 
 var DB *sql.DB
@@ -50,8 +66,8 @@ func setupRouter() *gin.Engine {
 		// Kiosk API
 		kiosk_router := v1.Group("/kiosk")
 		{
-			kiosk_router.GET("/sncheck", kiosk.CheckWearableSN)
-			kiosk_router.GET("/userlog", kiosk.PutUserlog)
+			kiosk_router.GET("/sncheck/:werableSN", kiosk.CheckWearableSN)
+			kiosk_router.POST("/userlog", kiosk.Userlog)
 
 		}
 
@@ -67,6 +83,7 @@ func setupRouter() *gin.Engine {
 			})
 
 		}
+<<<<<<< HEAD
 		commomn_router.POST("/device-add", func(c *gin.Context) {
 			Wearable_SN := c.Query("Wearable_SN")
 			UUID := c.Query("UUID")
@@ -80,15 +97,27 @@ func setupRouter() *gin.Engine {
 		})
 		commomn_router.DELETE("/device-del", func(c *gin.Context) {
 			Wearable_SN := c.Query("Wearable_SN")
+=======
+		commomn_router.POST("/user/device-add", func(c *gin.Context) {
+			c.JSON(http.StatusCreated, gin.H{
+				"rt":    http.StatusCreated,
+				"rtmsg": "Success",
+			})
+		})
+		commomn_router.DELETE("/user/device-del", func(c *gin.Context) {
+>>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 			c.JSON(http.StatusAccepted, gin.H{
 				"test1": Wearable_SN,
 				"rtmsg": "Success",
 			})
 		})
 		commomn_router.POST("/user/pid-add", func(c *gin.Context) {
+<<<<<<< HEAD
 			PSN := c.Query("PSN")
 			PSN_img := c.Query("PSN_img")
 			UUID := c.Query("UUID")
+=======
+>>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 			c.JSON(http.StatusCreated, gin.H{
 				"test1": PSN,
 				"test2": PSN_img,
@@ -97,7 +126,10 @@ func setupRouter() *gin.Engine {
 			})
 		})
 		commomn_router.DELETE("/user/pid-del", func(c *gin.Context) {
+<<<<<<< HEAD
 			PSN := c.Query("PSN")
+=======
+>>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 			c.JSON(http.StatusAccepted, gin.H{
 				"test1": PSN,
 				"rtmsg": "Success",
@@ -105,7 +137,10 @@ func setupRouter() *gin.Engine {
 		})
 		commomn_router.GET("/userlog/visitHistory", common.VisitHistory)
 		commomn_router.POST("/user/FBToken", func(c *gin.Context) {
+<<<<<<< HEAD
 			token := c.Query("token")
+=======
+>>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 			c.JSON(http.StatusCreated, gin.H{
 				"test1": token,
 				"rtmsg": "Success",
@@ -113,7 +148,10 @@ func setupRouter() *gin.Engine {
 		})
 		commomn_router.GET("/user/userInfo", common.UserInfo)
 		commomn_router.POST("/user/change", func(c *gin.Context) {
+<<<<<<< HEAD
 			Push := c.Query("Push_info Push")
+=======
+>>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 			c.JSON(http.StatusCreated, gin.H{
 				"test1": Push,
 				"rtmsg": "Success",
@@ -143,17 +181,27 @@ func setupRouter() *gin.Engine {
 				})
 			})
 			//web
+<<<<<<< HEAD
 			user_admin_router.GET("/subgroup/lookup", common.SubGroupLookup)
 			user_admin_router.GET("/subgroup/device/lookup/all", common.DeviceGroupLookUp)
 			user_admin_router.GET("/subgroup/device/lookup/group", common.DeviceGroupLookUp)
 		}
 
+=======
+			user_admin_router.GET("/subgroup/lookup",common.SubGroupLookup)
+			user_admin_router.GET("/subgroup/device/lookup/all",common.DeviceGroupLookUp)
+			user_admin_router.GET("/subgroup/device/lookup/group",common.DeviceGroupLookUp)
+			user_admin_router.POST("/subgroup/device/add",common.DevcieGroupAdd)
+			user_admin_router.DELETE("/subgroup/device/del",common.DeviceGroupDel)
+			user_admin_router.POST("/subgroup/authadd",common.GroupAuthAdd)
+		}
+>>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 	}
-
 	return r
 }
 
 func main() {
+<<<<<<< HEAD
 	r := setupRouter()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -178,6 +226,11 @@ func main() {
 	////////////GET TEST
 
 	////////////
+=======
+	// Router setup
+	r := setupRouter()
+	//Server start
+>>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 	r.Run()
 }
 
@@ -188,7 +241,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Credentials", "true")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With, token")
-		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+		c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS, GET, PUT")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
