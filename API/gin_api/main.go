@@ -1,17 +1,25 @@
 package main
 
 import (
-	_ "github.com/go-sql-driver/mysql"
+	"fmt"
+	"log"
 	"net/http"
 	"nfc_api/common"
 	_ "nfc_api/docs"
 	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
+	"time"
+
+	"database/sql"
+
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+var DB *sql.DB
 
 // @title NFC API
 // @version 0.0.1
@@ -59,43 +67,61 @@ func setupRouter() *gin.Engine {
 			})
 
 		}
-		commomn_router.POST("/user/device-add",func(c *gin.Context){
-			c.JSON(http.StatusCreated, gin.H{
-				"rt" : http.StatusCreated,
-				"rtmsg": "Success",
-			})
-		})
-		commomn_router.DELETE("/user/device-del",func(c *gin.Context){
-			c.JSON(http.StatusAccepted, gin.H{
-				"rtmsg": "Success",
-			})
-		})
-		commomn_router.POST("/user/pid-add",func(c *gin.Context){
+		commomn_router.POST("/device-add", func(c *gin.Context) {
+			Wearable_SN := c.Query("Wearable_SN")
+			UUID := c.Query("UUID")
+			_, err := DB.Exec("insert into user_info (wearable_SN, UUID) values (?,?) ", Wearable_SN, UUID)
+			if err != nil {
+				log.Fatal("insert into users error: ", err)
+			}
 			c.JSON(http.StatusCreated, gin.H{
 				"rtmsg": "Success",
 			})
 		})
-		commomn_router.DELETE("/user/pid-del",func(c *gin.Context){
+		commomn_router.DELETE("/device-del", func(c *gin.Context) {
+			Wearable_SN := c.Query("Wearable_SN")
 			c.JSON(http.StatusAccepted, gin.H{
+				"test1": Wearable_SN,
+				"rtmsg": "Success",
+			})
+		})
+		commomn_router.POST("/user/pid-add", func(c *gin.Context) {
+			PSN := c.Query("PSN")
+			PSN_img := c.Query("PSN_img")
+			UUID := c.Query("UUID")
+			c.JSON(http.StatusCreated, gin.H{
+				"test1": PSN,
+				"test2": PSN_img,
+				"test3": UUID,
+				"rtmsg": "Success",
+			})
+		})
+		commomn_router.DELETE("/user/pid-del", func(c *gin.Context) {
+			PSN := c.Query("PSN")
+			c.JSON(http.StatusAccepted, gin.H{
+				"test1": PSN,
 				"rtmsg": "Success",
 			})
 		})
 		commomn_router.GET("/userlog/visitHistory", common.VisitHistory)
-		commomn_router.POST("/user/FBToken",func(c *gin.Context){
+		commomn_router.POST("/user/FBToken", func(c *gin.Context) {
+			token := c.Query("token")
 			c.JSON(http.StatusCreated, gin.H{
+				"test1": token,
 				"rtmsg": "Success",
 			})
 		})
 		commomn_router.GET("/user/userInfo", common.UserInfo)
-		commomn_router.POST("/user/change",func(c *gin.Context){
+		commomn_router.POST("/user/change", func(c *gin.Context) {
+			Push := c.Query("Push_info Push")
 			c.JSON(http.StatusCreated, gin.H{
+				"test1": Push,
 				"rtmsg": "Success",
 			})
 		})
 
 		//web
-		commomn_router.GET("/user/login",common.UserLogin)
-
+		commomn_router.GET("/user/login", common.UserLogin)
 
 		//kiosk_Admin API
 		kiosk_admin_router := v1.Group("/kioskadmin")
@@ -113,33 +139,45 @@ func setupRouter() *gin.Engine {
 			user_admin_router.GET("/test", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
 					"message": "pong",
-					"code":http.StatusOK,
+					"code":    http.StatusOK,
 				})
 			})
 			//web
-			user_admin_router.GET("/subgroup/lookup",common.SubGroupLookup)
-			user_admin_router.GET("/subgroup/device/lookup/all",common.DeviceGroupLookUp)
-			user_admin_router.GET("/subgroup/device/lookup/group",common.DeviceGroupLookUp)
+			user_admin_router.GET("/subgroup/lookup", common.SubGroupLookup)
+			user_admin_router.GET("/subgroup/device/lookup/all", common.DeviceGroupLookUp)
+			user_admin_router.GET("/subgroup/device/lookup/group", common.DeviceGroupLookUp)
 		}
-
 
 	}
 
 	return r
 }
 
-
-
 func main() {
-
-
 	r := setupRouter()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
+	//////////
+	db, err := sql.Open("mysql", "root:hoseolab420@tcp(210.119.104.207:3306)/hoseo")
+	if err != nil {
+		panic(err)
+	}
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+	DB = db
+	common.DB = db
+	common.DB_l = db
 
+	fmt.Println("connect success", db)
+	defer db.Close()
+	//////////
+	////////////GET TEST
+
+	////////////
 	r.Run()
 }
 

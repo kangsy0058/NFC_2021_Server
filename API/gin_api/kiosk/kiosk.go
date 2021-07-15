@@ -16,7 +16,6 @@ import (
 //	IsUser     bool   `json:"isuser" example:"true"`
 //}
 
-
 // Weaable check godoc
 // @Summary check Wearable SN
 // @Description Wearable SN를 받아 사용하는 유저가 존재하는지 확인하는 기능
@@ -41,7 +40,7 @@ func CheckWearableSN(c *gin.Context) {
 	//
 	//	return
 	//}
-	usercheckMessage :=  user_stat
+	usercheckMessage := user_stat
 
 	c.JSON(http.StatusOK, gin.H{"response": usercheckMessage})
 
@@ -63,8 +62,5 @@ func PutUserlog(c *gin.Context) {
 	//message := name + " is very handsome"
 	//welcomeMessage := welcomeModel{1, message}
 
-
 	c.JSON(http.StatusCreated, gin.H{"response": true})
 }
-
-
