@@ -1,37 +1,22 @@
 package kiosk
 
 import (
-<<<<<<< HEAD
 	"net/http"
 	"nfc_api/database"
 	"nfc_api/redisinit"
 
-=======
->>>>>>> Haeil
-	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
-<<<<<<< HEAD
-//type welcomeModel struct {
-//	ID   int    `json:"id" example:"1" format:"int64"`
-//	Name string `json:"name" example:"account  name"`
-=======
 type UserLogModel struct {
-	KioskSN    string   `json:"Kiosk_SN" exmaple:"KSN1111"`
-	WearableSN string   `json:"Wearable_SN" example:"wsn1111"`
+	KioskSN    string    `json:"Kiosk_SN" exmaple:"KSN1111"`
+	WearableSN string    `json:"Wearable_SN" example:"wsn1111"`
 	Time       time.Time `json:"time" example:"03:14:18" foramt:"time"`
-	Date       time.Time`json:"date" example:"2021-05-16"`
-	Temp       float64  `json:"temp" example:"36.5" format:"float64"`
+	Date       time.Time `json:"date" example:"2021-05-16"`
+	Temp       float64   `json:"temp" example:"36.5" format:"float64"`
 }
-
-//type UserCheckModel struct {
-//	WearableSN string `json:"wearableSN" example:"wsn1111"`
-//	IsUser     bool   `json:"isuser" example:"true"`
->>>>>>> Haeil
-//}
 
 type UserCheckModel struct {
 	WearableSN string `json:"wearableSN" example:"wsn1111"`
@@ -109,7 +94,7 @@ func Userlog(c *gin.Context) {
 	Time := c.GetTime("Time")
 	Date := c.GetTime("date")
 	Temp := c.GetFloat64("temp")
-	response := UserLogModel{KioskSN,WearableSN,Time,Date, Temp}
+	response := UserLogModel{KioskSN, WearableSN, Time, Date, Temp}
 
 	c.JSON(http.StatusCreated, gin.H{"response": response})
 }
