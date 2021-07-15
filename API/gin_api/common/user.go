@@ -113,3 +113,21 @@ func DeviceGroupLookUp(c *gin.Context)  {
 		"data" : responseMessage,
 	})
 }
+
+func DevcieGroupAdd(c *gin.Context){
+	c.JSON(http.StatusCreated, gin.H{
+		"rtmsg":"Success",
+	})
+}
+
+func DeviceGroupDel(c *gin.Context)  {
+	c.JSON(http.StatusAccepted, gin.H{
+		"rtmsg":"Success",
+	})
+}
+
+func GroupAuthAdd(c *gin.Context){
+	c.JSON(http.StatusCreated, gin.H{
+		"rtmsg":"Success",
+	})
+}
