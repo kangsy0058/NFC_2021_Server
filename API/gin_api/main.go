@@ -87,7 +87,7 @@ func setupRouter() *gin.Engine {
 				"rtmsg": "Success",
 			})
 		})
-		commomn_router.GET("/user/userInfo", common.UserInfo)
+		commomn_router.GET("/user/info", common.UserInfo)
 		commomn_router.POST("/user/change", func(c *gin.Context) {
 			c.JSON(http.StatusCreated, gin.H{
 				"rtmsg": "Success",
@@ -95,7 +95,6 @@ func setupRouter() *gin.Engine {
 		})
 
 		//web
-		commomn_router.GET("/user/login", common.UserLogin) //로그인
 
 		//kiosk_Admin API
 		kiosk_admin_router := v1.Group("/kioskadmin")
@@ -123,12 +122,12 @@ func setupRouter() *gin.Engine {
 			user_admin_router.POST("/subgroup/device/add",common.DevcieGroupAdd) //디바이스 생성
 			user_admin_router.DELETE("/subgroup/device/del",common.DeviceGroupDel) //디바이스 삭제
 			user_admin_router.POST("/subgroup/authadd",common.GroupAuthAdd) //상위관리자 권한 부여
-			// 작업중 user_admin_router.GET("/account/lookup") //계정관리 조회
+			user_admin_router.GET("/account/lookup",common.AdminAccountLook) //계정관리 조회
 			user_admin_router.DELETE("/account/del",common.AdminAccounthDel) //계정 삭제
 			user_admin_router.POST("/account/post",common.AdminAccountPost) //계정 수정
 			// 작업중 user_admin_router.GET("/wearabledevice",common.AdminDeviceSK) //특정 사용자 동선 조회(시간순)
 			// 작업중 user_admin_router.GET("/wearabledevice") //특정 사용자와 겹치는 사용자 조회
-			// 명세서 TBD user_amdin_router.GET("/werabledevicelook") //웨어러블디바이스 조회
+			//user_admin_router.GET("/werabledevicelook",common.) //웨어러블디바이스 조회
 			user_admin_router.POST("/wearabledevice", func(c *gin.Context) {
 				c.JSON(http.StatusCreated, gin.H{
 					"rtmsg": "Success",
@@ -171,7 +170,10 @@ func setupRouter() *gin.Engine {
 			})// 자신 계정 삭제
 
 			//명세서 TBD(자신의 디바이스 로그인 조회) user_admin_router.GET("/devicelog")
-			//작업중(대시보드) user_admin_router.GET("/dashboard")
+			user_admin_router.GET("/dashboard", common.Dashboard)
+			//명세서 TBD user_admin_router.GET("/sendUser")
+			//명세서 TBD user_amdin_router.GET("/sendGroup")
+			//명세서 TBD user_admin_router.GET("/sendAll")
 
 		}
 	}

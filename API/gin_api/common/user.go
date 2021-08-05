@@ -3,13 +3,16 @@ package common
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"nfc_api/database"
 )
 
 
 type UserInfoModel struct {
-	PSN          string     `json:"PSN" example:"12가34나" `
-	WearableSN   string `json:"Wearable_SN" example:"wsn1111"`
-	Is_Admin     int `json:"Is_Admin" example:"1"`
+	level          int     `json:"level" example:"12가34나" `
+	name   string `json:"name" example:"홍길동"`
+	Token string `json:"Token" example:"aaaa.bbbb.cccc"`
+	Email string `json:"Email" example:"uuid@naver.com"`
+
 }
 type UserLoginModel struct {
 	groupCode  string `json:"Group_Code" example:"0001"`
@@ -51,16 +54,54 @@ type GroupDeviceModel struct {
 //}
 
 func UserInfo(c *gin.Context) {
-	PSN := "12가34나"
-	WearableSN := "wsn1111"
-	Is_Admin := 1
-	responseMessage := UserInfoModel{PSN, WearableSN,Is_Admin}
+	Type := c.Query("type")
 
-	c.JSON(http.StatusOK, gin.H{
-		"rt" : http.StatusOK,
-		"User_log": responseMessage,
-	})
+	//Level := 0
+	//Name := "홍길동"
+	//Token := "aaaa.bbbb.cccc"
+	//Email := "uuid@naver.com"
+	//responseMessage := UserInfoModel{Level, Name, Token, Email}
+
+	if Type == "1" {
+		c.JSON(http.StatusOK, gin.H{
+			"rt": http.StatusOK,
+			"data": gin.H{
+				"level":     1,
+				"name":      "홍길동1",
+				"token":     "aaaa.bbbb.cccc",
+				"email":     "uuid1@naver.com",
+				"groupCode": "0001",
+				"address":   "경기도 화성시 17-1",
+				"groupName": "그룹1",
+			}})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"rt":   http.StatusOK,
+			"data": gin.H{
+				"level": 0,
+				"name":  "홍길동1",
+				"token": "aaaa.bbbb.cccc",
+			}})
+
+	}
 }
+
+	//if err != nil {
+	//	//cache에 데이터가 없는경우 db 확인
+	//	db, err := database.Mariadb()
+	//	if err != nil {
+	//		// can't connect database return status code 500
+	//		c.AbortWithStatus(http.StatusInternalServerError)
+	//		return
+	//	}
+	//	defer db.Close()
+	//	c.JSON(http.StatusOK, gin.H{
+	//		"rt":   http.StatusOK,
+	//		"data": responseMessage,
+	//	})
+	//}
+
+
 
 func UserLogin(c *gin.Context)  {
 	groupCode :="0001"
@@ -91,9 +132,10 @@ func SubGroupLookup(c *gin.Context)  {
 	responseSubGroup := UserSubGroupModel{UUID, Email, DisplayName, Token, PSN, PSN_img, Is_Admin, WearableSN}
 	responseGroupList := GroupListModel{GroupCode,GroupName,Address}
 	c.JSON(http.StatusOK, gin.H{
-		"subGroup" : responseSubGroup,
-		"GroupList" : responseGroupList,
-		//"rt" : http.StatusOK,
+		"data" : gin.H{
+			"subGroup" : responseSubGroup,
+			"GroupList" : responseGroupList,
+		},
 		})
 
 }
@@ -113,6 +155,14 @@ func DeviceGroupLookUp(c *gin.Context)  {
 }
 
 func DevcieGroupAdd(c *gin.Context){
+	//groupCode := c.Query("groupCode")
+	//kioskSN := c.Query("kioskSN")
+	//detailPosition := c.Query("detailPosition")
+	//buildingName := c.Query("buildingName")
+	//latitude := c.Query("latitude")
+	//longtitide := c.Query("longtitide")
+
+
 	c.JSON(http.StatusCreated, gin.H{
 		"rtmsg":"Success",
 	})
@@ -130,6 +180,41 @@ func GroupAuthAdd(c *gin.Context){
 	})
 }
 
+func AdminAccountLook(c *gin.Context){
+	db, err := database.Mariadb()
+	var data UserSubGroupModel
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	rows,err := db.Query("SELECT * FROM user_info")
+	if err != nil{
+		return
+	}
+	for rows.Next(){
+		rows.Scan(&data.UUID, &data.Email, &data.DisplayName, &data.Token, &data.PSN,
+			&data.PSN_img, &data.Is_Admin, &data.WearableSN)
+	}
+	defer db.Close()
+	c.JSON(http.StatusOK, gin.H{
+		"data" : data,
+		//"data" : gin.H{
+		//		"UUID" : "이용자9",
+		//		"email" : "uuid5@gmail.com",
+		//		"displayname" : "이용자9",
+		//		"token" : "aaaa.bbbb.cccc",
+		//		"PSN" : "12가34나",
+		//		"PNS_img" : "C:Users사용자이름PicturesMyImg9.jpg",
+		//		"Is_admin" : 1,
+		//		"werable_SN" : "wsn1119",
+		//		},
+		"valid" : "true",
+	})
+	return
+}
+
+
 func AdminAccounthDel(c *gin.Context){
 	c.JSON(http.StatusAccepted, gin.H{
 		"rtmsg":"Success",
@@ -139,5 +224,26 @@ func AdminAccounthDel(c *gin.Context){
 func AdminAccountPost(c *gin.Context){
 	c.JSON(http.StatusCreated, gin.H{
 		"rtmsg":"Success",
+	})
+}
+
+func Dashboard(c *gin.Context){
+	c.JSON(http.StatusOK,gin.H{
+		"usedTerminalCount" : gin.H{
+			"now" : 30,
+			"change" : 40,
+		},
+		"usedKioskCount" : gin.H{
+			"now" : 20,
+			"change" : 30,
+		},
+		"avgTemperature" : gin.H{
+			"now" : 36,
+			"change" : 37,
+		},
+		"buildingVisitCount" : gin.H{
+			"now" : 10,
+			"change" : 20,
+		},
 	})
 }
