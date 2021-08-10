@@ -129,6 +129,7 @@ func SubGroupLookup(c *gin.Context)  {
 	GroupName := "그룹1"
 	Address := "경기도 화성서 17-1"
 
+
 	responseSubGroup := UserSubGroupModel{UUID, Email, DisplayName, Token, PSN, PSN_img, Is_Admin, WearableSN}
 	responseGroupList := GroupListModel{GroupCode,GroupName,Address}
 	c.JSON(http.StatusOK, gin.H{
@@ -141,16 +142,43 @@ func SubGroupLookup(c *gin.Context)  {
 }
 
 func DeviceGroupLookUp(c *gin.Context)  {
-	GroupCode := "0001"
-	KioskSN := "KSN1111"
-	DetailPosition := "충청남도 아산시 배방읍"
-	BuildingName := "1공학관"
-	Latitude := 36.738
-	Longtitude := 127.074
+	db, err := database.Mariadb()
+	//var data UserSubGroupModel
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
 
-	responseMessage := GroupDeviceModel{GroupCode, KioskSN, DetailPosition,BuildingName, Latitude, Longtitude}
-	c.JSON(http.StatusOK, gin.H{
-		"data" : responseMessage,
+	rows,err := db.Query("SELECT * FROM kiosk_set")
+	defer db.Close()
+	cols, err := rows.Columns()
+	if err != nil{
+		return
+	}
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
+	}
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+
+
+	//responseMessage := GroupDeviceModel{GroupCode, KioskSN, DetailPosition,BuildingName, Latitude, Longtitude}
+	c.JSON(http.StatusOK,gin.H{
+		"data" : results,
 	})
 }
 
@@ -182,23 +210,45 @@ func GroupAuthAdd(c *gin.Context){
 
 func AdminAccountLook(c *gin.Context){
 	db, err := database.Mariadb()
-	var data UserSubGroupModel
+	//var data UserSubGroupModel
 	if err != nil {
 		// can't connect database return status code 500
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
+
 	rows,err := db.Query("SELECT * FROM user_info")
+	defer db.Close()
+	cols, err := rows.Columns()
 	if err != nil{
 		return
 	}
-	for rows.Next(){
-		rows.Scan(&data.UUID, &data.Email, &data.DisplayName, &data.Token, &data.PSN,
-			&data.PSN_img, &data.Is_Admin, &data.WearableSN)
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
 	}
-	defer db.Close()
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+
+	//for rows.Next(){
+	//	rows.Scan(&data.UUID, &data.Email, &data.DisplayName, &data.Token, &data.PSN,
+	//		&data.PSN_img, &data.Is_Admin, &data.WearableSN)
+	//}
+
 	c.JSON(http.StatusOK, gin.H{
-		"data" : data,
+		"data" : results,
 		//"data" : gin.H{
 		//		"UUID" : "이용자9",
 		//		"email" : "uuid5@gmail.com",
@@ -225,6 +275,44 @@ func AdminAccountPost(c *gin.Context){
 	c.JSON(http.StatusCreated, gin.H{
 		"rtmsg":"Success",
 	})
+}
+
+func AdminUserLook(c *gin.Context){
+	db, err := database.Mariadb()
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	rows,err := db.Query("select latitude, longitude, building_name, date, time, group_code from user_log where wearable_sn=?","wsn1111")
+	defer db.Close()
+	cols, err := rows.Columns()
+	if err != nil{
+		return
+	}
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
+	}
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data" : results,
+	})
+	return
 }
 
 func Dashboard(c *gin.Context){

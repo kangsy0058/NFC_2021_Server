@@ -126,7 +126,7 @@ func setupRouter() *gin.Engine {
 			user_admin_router.DELETE("/account/del",common.AdminAccounthDel) //계정 삭제
 			user_admin_router.POST("/account/post",common.AdminAccountPost) //계정 수정
 			// 작업중 user_admin_router.GET("/wearabledevice",common.AdminDeviceSK) //특정 사용자 동선 조회(시간순)
-			// 작업중 user_admin_router.GET("/wearabledevice") //특정 사용자와 겹치는 사용자 조회
+			user_admin_router.GET("/wearabledevice/specificuserlook",common.AdminUserLook) //특정 사용자와 겹치는 사용자 조회
 			//user_admin_router.GET("/werabledevicelook",common.) //웨어러블디바이스 조회
 			user_admin_router.POST("/wearabledevice", func(c *gin.Context) {
 				c.JSON(http.StatusCreated, gin.H{
