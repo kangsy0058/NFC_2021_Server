@@ -181,6 +181,46 @@ func DeviceGroupLookUp(c *gin.Context)  {
 		"data" : results,
 	})
 }
+func DeviceGroupLookUp1(c *gin.Context)  {
+	db, err := database.Mariadb()
+	//var data UserSubGroupModel
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	rows,err := db.Query("select * from kiosk_set where group_code=? ","041-31499-그룹1")
+	defer db.Close()
+	cols, err := rows.Columns()
+	if err != nil{
+		return
+	}
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
+	}
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+
+
+	//responseMessage := GroupDeviceModel{GroupCode, KioskSN, DetailPosition,BuildingName, Latitude, Longtitude}
+	c.JSON(http.StatusOK,gin.H{
+		"data" : results,
+	})
+}
 
 func DevcieGroupAdd(c *gin.Context){
 	//groupCode := c.Query("groupCode")
@@ -314,6 +354,46 @@ func AdminUserLook(c *gin.Context){
 	})
 	return
 }
+func AdminDeviceLook(c *gin.Context){
+	db, err := database.Mariadb()
+	//var data UserSubGroupModel
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	rows,err := db.Query("SELECT * FROM user_info where UUID=?","이용자10")
+	defer db.Close()
+	cols, err := rows.Columns()
+	if err != nil{
+		return
+	}
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
+	}
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data" : results,
+	})
+	return
+}
+
 
 func Dashboard(c *gin.Context){
 	c.JSON(http.StatusOK,gin.H{

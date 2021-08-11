@@ -3,6 +3,7 @@ package common
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"nfc_api/database"
 )
 
 type UserLogModel struct {
@@ -57,3 +58,43 @@ func VisitHistory(c *gin.Context) {
 //		"UUID:":uuid,
 //	})
 //}
+
+func AdminNFClog(c *gin.Context){
+	db, err := database.Mariadb()
+	//var data UserSubGroupModel
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	rows,err := db.Query("select *from user_log")
+	defer db.Close()
+	cols, err := rows.Columns()
+	if err != nil{
+		return
+	}
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
+	}
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data" : results,
+	})
+	return
+}
