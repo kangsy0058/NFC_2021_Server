@@ -17,28 +17,19 @@
 CREATE DATABASE IF NOT EXISTS `hoseo` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
 USE `hoseo`;
 
--- 테이블 hoseo.kiosk_info 구조 내보내기
-CREATE TABLE IF NOT EXISTS `kiosk_info` (
-  `kiosk_SN` varchar(45) NOT NULL COMMENT '키오스크 시리얼넘버',
-  `kiosk_log` datetime DEFAULT NULL COMMENT '키오스크 로그',
-  UNIQUE KEY `kiosk_SN` (`kiosk_SN`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='Kiosk 정보';
+-- 테이블 hoseo.FCM 구조 내보내기
+CREATE TABLE IF NOT EXISTS `FCM` (
+  `token` varchar(45) DEFAULT NULL,
+  `ch_id` int(11) DEFAULT NULL,
+  KEY `FCM_FK` (`token`),
+  KEY `FCM_FK_1` (`ch_id`),
+  CONSTRAINT `FCM_FK` FOREIGN KEY (`token`) REFERENCES `user_info` (`token`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FCM_FK_1` FOREIGN KEY (`ch_id`) REFERENCES `push_info` (`ch_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='FCM';
 
--- 테이블 데이터 hoseo.kiosk_info:~11 rows (대략적) 내보내기
-/*!40000 ALTER TABLE `kiosk_info` DISABLE KEYS */;
-INSERT IGNORE INTO `kiosk_info` (`kiosk_SN`, `kiosk_log`) VALUES
-	('KSN1111', NULL),
-	('KSN1112', NULL),
-	('KSN1113', NULL),
-	('KSN1114', NULL),
-	('KSN1115', NULL),
-	('KSN1116', NULL),
-	('KSN1117', NULL),
-	('KSN1118', NULL),
-	('KSN1119', NULL),
-	('KSN1120', NULL),
-	('ksn1121', '2021-08-17 05:00:00');
-/*!40000 ALTER TABLE `kiosk_info` ENABLE KEYS */;
+-- 테이블 데이터 hoseo.FCM:~0 rows (대략적) 내보내기
+/*!40000 ALTER TABLE `FCM` DISABLE KEYS */;
+/*!40000 ALTER TABLE `FCM` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;

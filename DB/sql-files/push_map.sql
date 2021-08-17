@@ -1,7 +1,7 @@
 -- --------------------------------------------------------
--- 호스트:                          127.0.0.1
--- 서버 버전:                        10.6.0-MariaDB - mariadb.org binary distribution
--- 서버 OS:                        Win64
+-- 호스트:                          210.119.104.207
+-- 서버 버전:                        10.6.2-MariaDB-1:10.6.2+maria~focal - mariadb.org binary distribution
+-- 서버 OS:                        debian-linux-gnu
 -- HeidiSQL 버전:                  11.1.0.6116
 -- --------------------------------------------------------
 
@@ -14,7 +14,7 @@
 
 
 -- hoseo 데이터베이스 구조 내보내기
-CREATE DATABASE IF NOT EXISTS `hoseo` /*!40100 DEFAULT CHARACTER SET utf8 */;
+CREATE DATABASE IF NOT EXISTS `hoseo` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
 USE `hoseo`;
 
 -- 테이블 hoseo.push_map 구조 내보내기
@@ -23,12 +23,11 @@ CREATE TABLE IF NOT EXISTS `push_map` (
   `UUID` varchar(45) NOT NULL,
   KEY `FK1_chid` (`ch_id`),
   KEY `FK2_chUUID` (`UUID`),
-  CONSTRAINT `FK1_chid` FOREIGN KEY (`ch_id`) REFERENCES `push_info` (`ch_id`),
-  CONSTRAINT `FK2_chUUID` FOREIGN KEY (`UUID`) REFERENCES `user_info` (`UUID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  CONSTRAINT `FK1_chid` FOREIGN KEY (`ch_id`) REFERENCES `push_info` (`ch_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK2_chUUID` FOREIGN KEY (`UUID`) REFERENCES `user_info` (`UUID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='푸쉬 매핑';
 
 -- 테이블 데이터 hoseo.push_map:~0 rows (대략적) 내보내기
-DELETE FROM `push_map`;
 /*!40000 ALTER TABLE `push_map` DISABLE KEYS */;
 /*!40000 ALTER TABLE `push_map` ENABLE KEYS */;
 
