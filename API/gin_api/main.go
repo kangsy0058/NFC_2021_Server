@@ -93,8 +93,10 @@ func setupRouter() *gin.Engine {
 				"rtmsg": "Success",
 			})
 		})
-
 		//web
+
+
+
 
 		//kiosk_Admin API
 		kiosk_admin_router := v1.Group("/kioskadmin")
@@ -116,6 +118,7 @@ func setupRouter() *gin.Engine {
 				})
 			})
 			//web
+
 			user_admin_router.GET("/subgroup/lookup",common.SubGroupLookup) //하위그룹관리 상위관리자에서 하위관리자 정보 조회
 			user_admin_router.GET("/subgroup/device/lookup/all",common.DeviceGroupLookUp) //디바이스 전체 조회
 			user_admin_router.GET("/subgroup/device/lookup/group",common.DeviceGroupLookUp1) // 디바이스 그룹별 조회
@@ -127,6 +130,7 @@ func setupRouter() *gin.Engine {
 			user_admin_router.POST("/account/post",common.AdminAccountPost) //계정 수정
 			// 작업중 user_admin_router.GET("/wearabledevice",common.AdminDeviceSK) //특정 사용자 동선 조회(시간순)
 			user_admin_router.GET("/wearabledevice/specificuserlook",common.AdminUserLook) //특정 사용자와 겹치는 사용자 조회
+			user_admin_router.GET("/wearabledevice/specificuserlook/specificuserotheruser",common.AdminOtherUserLook) //특정 사용자 req 일 때 동선 겹치는 사용자 파악
 			user_admin_router.GET("/wearabledevice/look",common.AdminDeviceLook) //웨어러블디바이스 조회
 			user_admin_router.POST("/wearabledevice", func(c *gin.Context) {
 				c.JSON(http.StatusCreated, gin.H{
@@ -156,21 +160,21 @@ func setupRouter() *gin.Engine {
 				})
 			})//하위관리자 디바이스 생성 수정
 
-			//명세서 TBD user_admin_router.GET("/deviceMGMT")
+			user_admin_router.GET("/deviceMGMT",common.DeviceMT)
 
-			user_admin_router.PUT("accountMGMT",func(c *gin.Context){
+			user_admin_router.PUT("/accountMGMT",func(c *gin.Context){
 				c.JSON(http.StatusCreated, gin.H{
 					"rtmsg" : "Success",
 				})
 			})//자신 게정 수정
-			user_admin_router.DELETE("accountMGMT", func(c *gin.Context) {
+			user_admin_router.DELETE("/accountMGMT", func(c *gin.Context) {
 				c.JSON(http.StatusAccepted,gin.H{
 					"rtmsg" : "Success",
 				})
 			})// 자신 계정 삭제
-
+			user_admin_router.GET("/devicelog/lookup", common.DeivceLog)
 			//명세서 TBD(자신의 디바이스 로그인 조회) user_admin_router.GET("/devicelog")
-			user_admin_router.GET("/dashboard", common.Dashboard)
+			user_admin_router.GET("/dashboard/data-trends", common.Dashboard)
 			//명세서 TBD user_admin_router.GET("/sendUser")
 			//명세서 TBD user_amdin_router.GET("/sendGroup")
 			//명세서 TBD user_admin_router.GET("/sendAll")

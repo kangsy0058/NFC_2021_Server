@@ -190,7 +190,7 @@ func DeviceGroupLookUp1(c *gin.Context)  {
 		return
 	}
 
-	rows,err := db.Query("select * from kiosk_set where group_code=? ","041-31499-그룹1")
+	rows,err := db.Query("select Group_code,building_name,detail_position,kiosk_sn,latitude,longitude from kiosk_set where group_code=?  ","041-31499-g1")
 	defer db.Close()
 	cols, err := rows.Columns()
 	if err != nil{
@@ -257,7 +257,7 @@ func AdminAccountLook(c *gin.Context){
 		return
 	}
 
-	rows,err := db.Query("SELECT * FROM user_info")
+	rows,err := db.Query("select u.Is_admin,u.UUID,u.displayname,u.email,g.Group_name,g.address from user_info as u join group_list as g on u.group_code=g.group_code")
 	defer db.Close()
 	cols, err := rows.Columns()
 	if err != nil{
@@ -354,7 +354,86 @@ func AdminUserLook(c *gin.Context){
 	})
 	return
 }
+
+func AdminOtherUserLook(c *gin.Context){
+	db, err := database.Mariadb()
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	rows,err := db.Query("select latitude,longitude,building_name,date,time,group_code from user_log where building_name IN (select building_name from user_log where wearable_sn='?')","wsn1111")
+	defer db.Close()
+	cols, err := rows.Columns()
+	if err != nil{
+		return
+	}
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
+	}
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data" : results,
+	})
+	return
+}
+
 func AdminDeviceLook(c *gin.Context){
+	db, err := database.Mariadb()
+	//var data UserSubGroupModel
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	rows,err := db.Query("select *from user_info where wearable_sn=?","wsn1111")
+	defer db.Close()
+	cols, err := rows.Columns()
+	if err != nil{
+		return
+	}
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
+	}
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data" : results,
+	})
+	return
+}
+
+func DeviceMT(c *gin.Context){
 	db, err := database.Mariadb()
 	//var data UserSubGroupModel
 	if err != nil {
@@ -391,9 +470,8 @@ func AdminDeviceLook(c *gin.Context){
 	c.JSON(http.StatusOK, gin.H{
 		"data" : results,
 	})
-	return
-}
 
+}
 
 func Dashboard(c *gin.Context){
 	c.JSON(http.StatusOK,gin.H{
