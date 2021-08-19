@@ -24,7 +24,7 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/common/visitHistory/{Wearable_SN}": {
+        "/v1/common/visitHistory/{Wearable_SN}{start_date}{end_date}": {
             "get": {
                 "description": "테스트용 작성후 삭제예정",
                 "consumes": [
@@ -33,12 +33,29 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "common"
+                ],
                 "summary": "app working test",
                 "operationId": "Wearable_SN",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Wearable_SN",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "start_date",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "end_date",
                         "name": "name",
                         "in": "path",
                         "required": true
@@ -54,7 +71,7 @@ var doc = `{
                 }
             }
         },
-        "/v1/kiosk/checksn/{sn}": {
+        "/v1/kiosk/checksn/{wearableSN}": {
             "get": {
                 "description": "Wearable SN를 받아 사용하는 유저가 존재하는지 확인하는 기능",
                 "consumes": [
@@ -62,6 +79,9 @@ var doc = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "Kiosk"
                 ],
                 "summary": "check Wearable SN",
                 "operationId": "userCheck",
@@ -93,6 +113,9 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Kiosk"
+                ],
                 "summary": "kiosk working test",
                 "operationId": "hello",
                 "parameters": [
@@ -108,7 +131,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/kiosk.welcomeModel"
+                            "$ref": "#/definitions/kiosk.UserLogModel"
                         }
                     }
                 }
@@ -154,17 +177,28 @@ var doc = `{
                 }
             }
         },
-        "kiosk.welcomeModel": {
+        "kiosk.UserLogModel": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer",
-                    "format": "int64",
-                    "example": 1
+                "Kiosk_SN": {
+                    "type": "string"
                 },
-                "name": {
+                "Wearable_SN": {
                     "type": "string",
-                    "example": "account  name"
+                    "example": "wsn1111"
+                },
+                "date": {
+                    "type": "string",
+                    "example": "2021-05-16"
+                },
+                "temp": {
+                    "type": "number",
+                    "format": "float64",
+                    "example": 36.5
+                },
+                "time": {
+                    "type": "string",
+                    "example": "03:14:18"
                 }
             }
         }

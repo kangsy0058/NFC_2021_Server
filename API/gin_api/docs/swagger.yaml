@@ -27,14 +27,22 @@ definitions:
         example: wsn1111
         type: string
     type: object
-  kiosk.welcomeModel:
+  kiosk.UserLogModel:
     properties:
-      id:
-        example: 1
-        format: int64
-        type: integer
-      name:
-        example: account  name
+      Kiosk_SN:
+        type: string
+      Wearable_SN:
+        example: wsn1111
+        type: string
+      date:
+        example: "2021-05-16"
+        type: string
+      temp:
+        example: 36.5
+        format: float64
+        type: number
+      time:
+        example: "03:14:18"
         type: string
     type: object
 host: localhost:8080
@@ -44,7 +52,7 @@ info:
   title: NFC API
   version: 0.0.1
 paths:
-  /v1/common/visitHistory/{Wearable_SN}:
+  /v1/common/visitHistory/{Wearable_SN}{start_date}{end_date}:
     get:
       consumes:
       - application/json
@@ -52,6 +60,16 @@ paths:
       operationId: Wearable_SN
       parameters:
       - description: Wearable_SN
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: start_date
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: end_date
         in: path
         name: name
         required: true
@@ -64,7 +82,9 @@ paths:
           schema:
             $ref: '#/definitions/common.UserLogModel'
       summary: app working test
-  /v1/kiosk/checksn/{sn}:
+      tags:
+      - common
+  /v1/kiosk/checksn/{wearableSN}:
     get:
       consumes:
       - application/json
@@ -84,6 +104,8 @@ paths:
           schema:
             $ref: '#/definitions/kiosk.UserCheckModel'
       summary: check Wearable SN
+      tags:
+      - Kiosk
   /v1/kiosk/welcome/{name}:
     get:
       consumes:
@@ -102,6 +124,8 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/kiosk.welcomeModel'
+            $ref: '#/definitions/kiosk.UserLogModel'
       summary: kiosk working test
+      tags:
+      - Kiosk
 swagger: "2.0"
