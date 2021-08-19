@@ -2,21 +2,12 @@ package common
 
 import (
 	"database/sql"
-<<<<<<< HEAD
 	"log"
-=======
-	"fmt"
-	"github.com/gin-gonic/gin"
->>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 	"net/http"
+	"nfc_api/database"
 
 	"github.com/gin-gonic/gin"
 )
-
-<<<<<<< HEAD
-var DB *sql.DB
-=======
->>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 
 type UserInfoModel struct {
 	PSN        string `json:"PSN" example:"12가34나" `
@@ -51,36 +42,35 @@ type GroupDeviceModel struct {
 	Longtitude     float64 `json:"Longtitude" example:"127.074"`
 }
 
-<<<<<<< HEAD
-=======
-func db()  {
-	db, err := sql.Open("mysql", "root:hoseolab420@tcp(210.119.104.207:3306)/hoseo")
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close()
-	var version string
-	db.QueryRow("SELECT VERSION()").Scan(&version)
-	fmt.Println("Connected to:", version)
-}
-
->>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939
 func UserInfo(c *gin.Context) {
 	UUID := c.Query("UUID")
-	rows, err := DB.Query("Select PSN, wearable_SN, Is_admin FROM user_info where UUID = ?", UUID)
+	db, err := database.Mariadb()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+	rows, err := db.Query("Select PSN, wearable_SN, ls_admin FROM user_info where UUID = ?", UUID)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-	var PSN, wearable_SN string
-	var Is_admin int
+	var responseMessage UserInfoModel
+	var tmp_PSN, tmp_WSN sql.NullString
 	for rows.Next() {
-		err := rows.Scan(&PSN, &wearable_SN, &Is_admin)
+		err := rows.Scan(&tmp_PSN, &tmp_WSN, &responseMessage.Is_Admin)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	responseMessage := UserInfoModel{PSN, wearable_SN, Is_admin}
+	responseMessage.PSN = tmp_PSN.String
+	responseMessage.WearableSN = tmp_WSN.String
+	if !tmp_PSN.Valid {
+		responseMessage.PSN = "정보없음"
+	}
+	if !tmp_WSN.Valid {
+		responseMessage.WearableSN = "정보없음"
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"User_log": responseMessage,
@@ -135,24 +125,3 @@ func DeviceGroupLookUp(c *gin.Context) {
 		"data": responseMessage,
 	})
 }
-<<<<<<< HEAD
-=======
-
-func DevcieGroupAdd(c *gin.Context){
-	c.JSON(http.StatusCreated, gin.H{
-		"rtmsg":"Success",
-	})
-}
-
-func DeviceGroupDel(c *gin.Context)  {
-	c.JSON(http.StatusAccepted, gin.H{
-		"rtmsg":"Success",
-	})
-}
-
-func GroupAuthAdd(c *gin.Context){
-	c.JSON(http.StatusCreated, gin.H{
-		"rtmsg":"Success",
-	})
-}
->>>>>>> 95f215cc4cbba44dbce37a874071ff731cda8939

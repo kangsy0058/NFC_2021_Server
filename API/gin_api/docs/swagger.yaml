@@ -18,6 +18,33 @@ definitions:
         example: "36.5"
         type: string
     type: object
+  kiosk.UserCheckModel:
+    properties:
+      isuser:
+        example: true
+        type: boolean
+      wearableSN:
+        example: wsn1111
+        type: string
+    type: object
+  kiosk.UserLogModel:
+    properties:
+      Kiosk_SN:
+        type: string
+      Wearable_SN:
+        example: wsn1111
+        type: string
+      date:
+        example: "2021-05-16"
+        type: string
+      temp:
+        example: 36.5
+        format: float64
+        type: number
+      time:
+        example: "03:14:18"
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -25,7 +52,7 @@ info:
   title: NFC API
   version: 0.0.1
 paths:
-  /v1/common/visitHistory/{Wearable_SN}:
+  /v1/common/visitHistory/{Wearable_SN}{start_date}{end_date}:
     get:
       consumes:
       - application/json
@@ -33,6 +60,16 @@ paths:
       operationId: Wearable_SN
       parameters:
       - description: Wearable_SN
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: start_date
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: end_date
         in: path
         name: name
         required: true
@@ -45,4 +82,50 @@ paths:
           schema:
             $ref: '#/definitions/common.UserLogModel'
       summary: app working test
+      tags:
+      - common
+  /v1/kiosk/checksn/{wearableSN}:
+    get:
+      consumes:
+      - application/json
+      description: Wearable SN를 받아 사용하는 유저가 존재하는지 확인하는 기능
+      operationId: userCheck
+      parameters:
+      - description: Wearable Serial Number
+        in: path
+        name: sn
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/kiosk.UserCheckModel'
+      summary: check Wearable SN
+      tags:
+      - Kiosk
+  /v1/kiosk/welcome/{name}:
+    get:
+      consumes:
+      - application/json
+      description: 테스트용 작성후 삭제예정
+      operationId: hello
+      parameters:
+      - description: User name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/kiosk.UserLogModel'
+      summary: kiosk working test
+      tags:
+      - Kiosk
 swagger: "2.0"
