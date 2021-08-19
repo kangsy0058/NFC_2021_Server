@@ -7,7 +7,7 @@ import (
 )
 
 func Mariadb() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:hoseolab420@tcp(59.27.40.116:3306)/hoseo?parseTime=true")
+	db, err := sql.Open("mysql", "root:hoseolab420@tcp(210.119.104.207:3306)/hoseo")
 	if err != nil {
 		return nil, err
 	}

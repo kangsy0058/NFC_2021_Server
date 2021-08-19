@@ -1,13 +1,11 @@
 package main
 
 import (
-	"log"
-
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
 	"net/http"
 	"nfc_api/common"
 	"nfc_api/database"
@@ -62,114 +60,36 @@ func setupRouter() *gin.Engine {
 			})
 
 		}
-		commomn_router.POST("/device-add", func(c *gin.Context) {
-			Wearable_SN := c.Query("Wearable_SN")
-			UUID := c.Query("UUID")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("INSERT into user_info (wearable_SN, UUID) values (?,?) ", Wearable_SN, UUID)
-			if err != nil {
-				_, err = db.Exec("UPDATE user_info SET wearable_SN = ? WHERE UUID = ?", Wearable_SN, UUID)
-				if err != nil {
-					rtmsg = "Failed"
-					log.Fatal("insert error: ", err)
-				}
-			}
+		commomn_router.POST("/user/device-add", func(c *gin.Context) {
 			c.JSON(http.StatusCreated, gin.H{
-				"rtmsg": rtmsg,
+				"rt":    http.StatusCreated,
+				"rtmsg": "Success",
 			})
 		})
-		commomn_router.DELETE("/device-del", func(c *gin.Context) {
-			Wearable_SN := c.Query("Wearable_SN")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET wearable_SN = NULL WHERE wearable_SN = ?", Wearable_SN)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("delete error: ", err)
-			}
+		commomn_router.DELETE("/user/device-del", func(c *gin.Context) {
 			c.JSON(http.StatusAccepted, gin.H{
-				"rtmsg": rtmsg,
+				"rtmsg": "Success",
 			})
 		})
-		commomn_router.POST("/user/pid", func(c *gin.Context) {
-			PSN := c.Query("PSN")
-			PSN_img := c.Query("PSN_img")
-			UUID := c.Query("UUID")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET PSN = ?, PSN_img = ? WHERE UUID = ?", PSN, PSN_img, UUID)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("insert into users error: ", err)
-			}
-			c.JSON(http.StatusCreated, gin.H{
-				"rtmsg": rtmsg,
-			})
-		})
-		commomn_router.DELETE("/user/pid", func(c *gin.Context) {
-			PSN := c.Query("PSN")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET PSN = NULL, PSN_img = NULL WHERE PSN = ?", PSN)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("delete error: ", err)
-			}
-			c.JSON(http.StatusAccepted, gin.H{
-				"rtmsg": rtmsg,
-			})
-		})
-		commomn_router.GET("/userlog/visitHistory", common.VisitHistory)
-		commomn_router.POST("/user/FBToken", func(c *gin.Context) {
-			UUID := c.Query("UUID")
-			token := c.Query("token")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET token = ? WHERE UUID = ?", token, UUID)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("insert into users error: ", err)
-			}
-			c.JSON(http.StatusCreated, gin.H{
-				"rtmsg": rtmsg,
-			})
-		})
-		commomn_router.GET("/user/userinfo", common.UserInfo)
-		commomn_router.POST("/user/change", func(c *gin.Context) {
-
+		commomn_router.POST("/user/pid-add", func(c *gin.Context) {
 			c.JSON(http.StatusCreated, gin.H{
 				"rtmsg": "Success",
 			})
 		})
-		commomn_router.DELETE("/user/change", func(c *gin.Context) {
-
+		commomn_router.DELETE("/user/pid-del", func(c *gin.Context) {
 			c.JSON(http.StatusAccepted, gin.H{
+				"rtmsg": "Success",
+			})
+		})
+		commomn_router.GET("/userlog/visitHistory", common.VisitHistory)
+		commomn_router.POST("/user/FBToken", func(c *gin.Context) {
+			c.JSON(http.StatusCreated, gin.H{
+				"rtmsg": "Success",
+			})
+		})
+		commomn_router.GET("/user/userInfo", common.UserInfo)
+		commomn_router.POST("/user/change", func(c *gin.Context) {
+			c.JSON(http.StatusCreated, gin.H{
 				"rtmsg": "Success",
 			})
 		})
@@ -197,20 +117,32 @@ func setupRouter() *gin.Engine {
 				})
 			})
 			//web
-			user_admin_router.GET("/subgroup/lookup", common.SubGroupLookup)
-			user_admin_router.GET("/subgroup/device/lookup/all", common.DeviceGroupLookUp)
-			user_admin_router.GET("/subgroup/device/lookup/group", common.DeviceGroupLookUp)
+			user_admin_router.GET("/subgroup/lookup",common.SubGroupLookup)
+			user_admin_router.GET("/subgroup/device/lookup/all",common.DeviceGroupLookUp)
+			user_admin_router.GET("/subgroup/device/lookup/group",common.DeviceGroupLookUp)
+			user_admin_router.POST("/subgroup/device/add",common.DevcieGroupAdd)
+			user_admin_router.DELETE("/subgroup/device/del",common.DeviceGroupDel)
+			user_admin_router.POST("/subgroup/authadd",common.GroupAuthAdd)
+			// 작업중 user_admin_router.GET("/account/lookup")
+			user_admin_router.DELETE("/account/del",common.AdminAccounthDel)
+			user_admin_router.POST("/account/post",common.AdminAccountPost)
 		}
-
 	}
 	return r
 }
 
 func main() {
+	//DB Connection Check
+	var version string
+	db, _ := database.Mariadb()
+	db.QueryRow("SELECT VERSION()").Scan(&version)
+	fmt.Println("Connected to:", version)
 	// Router setup
 	r := setupRouter()
 	//Server start
 	r.Run()
+
+
 }
 
 // CORS 세팅용 middleware
