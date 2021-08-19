@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"nfc_api/database"
@@ -363,8 +364,12 @@ func AdminOtherUserLook(c *gin.Context){
 		return
 	}
 
-	rows,err := db.Query("select latitude,longitude,building_name,date,time,group_code from user_log where building_name IN (select building_name from user_log where wearable_sn='?')","wsn1111")
+	wearableSN:= "WSN1111"
+
+	rows, err := db.Query("select latitude,longitude,building_name,time from user_log where building_name=(select building_name from user_log where wearable_sn= ? group by building_name)",wearableSN)
+	// 이부분 에러
 	defer db.Close()
+	fmt.Printf("", rows,123)
 	cols, err := rows.Columns()
 	if err != nil{
 		return
@@ -387,8 +392,12 @@ func AdminOtherUserLook(c *gin.Context){
 		}
 		results = append(results, result)
 	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"data" : results,
+		"data" :gin.H{
+			"werable_SN" : wearableSN,
+			"log": results,
+		},
 	})
 	return
 }
