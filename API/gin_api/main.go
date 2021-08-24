@@ -161,6 +161,7 @@ func setupRouter() *gin.Engine {
 			})
 		})
 		commomn_router.GET("/user/userinfo", common.AppUserInfo)
+		commomn_router.GET("/user/info",common.CommonUserInfo)
 		commomn_router.POST("/user/change", func(c *gin.Context) {
 
 			c.JSON(http.StatusCreated, gin.H{
@@ -196,10 +197,77 @@ func setupRouter() *gin.Engine {
 					"code":    http.StatusOK,
 				})
 			})
+
 			//web
 			user_admin_router.GET("/subgroup/lookup", common.SubGroupLookup)
+			user_admin_router.PUT("/subgroup/group",func(c *gin.Context) {
+			c.JSON(http.StatusCreated, gin.H{
+				"rtmsg": "Success",
+			})
+			})
+			user_admin_router.PUT("/subgroup/user",func(c *gin.Context) {
+				c.JSON(http.StatusCreated, gin.H{
+					"rtmsg": "Success",
+				})
+			})
+			user_admin_router.GET("/subgroup/group/all",common.GroupAll)//그룹 목록 전체 조회
+			user_admin_router.GET("/subgroup/group/lookup/all",common.SubGroupAll)// (하위그룹관리)모든 하위관리자 그룹 정보 조회
 			user_admin_router.GET("/subgroup/device/lookup/all", common.DeviceGroupLookUp)
-			user_admin_router.GET("/subgroup/device/lookup/group", common.DeviceGroupLookUp)
+			user_admin_router.GET("/subgroup/device/lookup/group", common.DeviceGroupLookUp1)
+			user_admin_router.POST("/subgroup/device/add",common.DevcieGroupAdd) //디바이스 생성
+			user_admin_router.DELETE("/subgroup/device/del",common.DeviceGroupDel) //디바이스 삭제
+			user_admin_router.POST("/subgroup/authadd",common.GroupAuthAdd) //상위관리자 권한 부여
+			user_admin_router.GET("/account",common.AdminAccountLook) //계정관리 조회
+			user_admin_router.DELETE("/account",common.AdminAccounthDel) //계정 삭제
+			user_admin_router.PUT("/account",common.AdminAccountPut) //계정 수정
+			user_admin_router.GET("/wearabledevice/specificuserlook",common.AdminUserLook) //특정 사용자와 겹치는 사용자 조회
+			user_admin_router.GET("/wearabledevice/specificuserlook/specificuserotheruser",common.AdminOtherUserLook) //특정 사용자 req 일 때 동선 겹치는 사용자 파악
+			user_admin_router.GET("/wearabledevice",common.AdminDeviceLook) //웨어러블디바이스 조회
+			user_admin_router.POST("/wearabledevice", func(c *gin.Context) {
+				c.JSON(http.StatusCreated, gin.H{
+					"rtmsg": "Success",
+				})
+			})//웨어러블디바이스 생성
+			user_admin_router.PUT("/wearabledevice", func(c *gin.Context) {
+				c.JSON(http.StatusCreated, gin.H{
+					"rtmsg": "Success",
+				})
+			}) //웨어러블디바이스 수정
+			user_admin_router.DELETE("/wearabledevice", func(c *gin.Context){
+				c.JSON(http.StatusAccepted, gin.H{
+					"rtmsg": "Success",
+				})
+			})//웨어러블디바이스 삭제
+			user_admin_router.GET("/nfclog/lookup",common.AdminNFClog) // NFC 태그 기록
+			user_admin_router.POST("/deviceMGMT", func(c *gin.Context) {
+				c.JSON(http.StatusCreated, gin.H{
+					"rtmsg" : "Success",
+				})
+			})//하위관리자 디바이스 생성
+			user_admin_router.PUT("/deviceMGMT", func(c *gin.Context) {
+				c.JSON(http.StatusCreated, gin.H{
+					"rtmsg" : "Success",
+				})
+			})//하위관리자 디바이스 생성 수정
+			user_admin_router.GET("/deviceMGMT",common.DeviceMT)
+
+			user_admin_router.PUT("/accountMGMT",func(c *gin.Context){
+				c.JSON(http.StatusCreated, gin.H{
+					"rtmsg" : "Success",
+				})
+			})//자신 게정 수정
+			user_admin_router.DELETE("/accountMGMT", func(c *gin.Context) {
+				c.JSON(http.StatusAccepted,gin.H{
+					"rtmsg" : "Success",
+				})
+			})// 자신 계정 삭제
+			user_admin_router.GET("devicelog/lookup",common.DeivceLog)
+			user_admin_router.GET("/dashboard/data-graph",common.DataGraph)
+			user_admin_router.GET("/dashboard/data-trends",common.Dashboard)
+
+			//작업중 user_admin_router.GET("/sendUser")
+			//작업중 user_amdin_router.GET("/sendGroup")
+			//작업중 user_admin_router.GET("/sendAll")
 		}
 
 	}

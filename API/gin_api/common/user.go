@@ -15,7 +15,6 @@ type AppUserInfoModel struct {
 	WearableSN string `json:"Wearable_SN" example:"wsn1111"`
 	Is_Admin   int    `json:"Is_Admin" example:"0" format"int63"`
 }
-
 type UserInfoModel struct {
 	level int    `json:"level" example:"12가34나" `
 	name  string `json:"name" example:"홍길동"`
@@ -50,16 +49,6 @@ type GroupDeviceModel struct {
 	Longtitude     float64 `json:"Longtitude" example:"127.074"`
 }
 
-//대시보드 작업중
-//func Dashboard(c *gin.Context) {
-//	now := 40
-//	change := 10
-//	usedTerminalCount :=
-//
-//	c.JSON(http.StatusOK, gin.H{
-//		"data" : "usedTerminalCount:",
-//	})
-//}
 
 func AppUserInfo(c *gin.Context) {
 	UUID := c.Query("UUID")
@@ -112,6 +101,7 @@ func CommonUserInfo(c *gin.Context) {
 				"level":     1,
 				"name":      "홍길동1",
 				"token":     "aaaa.bbbb.cccc",
+				"approve":  1,
 				"email":     "uuid1@naver.com",
 				"groupCode": "0001",
 				"address":   "경기도 화성시 17-1",
@@ -156,31 +146,7 @@ func UserLogin(c *gin.Context) {
 }
 
 //admin
-func SubGroupLookup(c *gin.Context) {
-	UUID := "이용자1"
-	Email := "uuid@naver.com"
-	DisplayName := "이용자1"
-	Token := "aaaa.bbbb.cccc"
-	PSN := "12가34나"
-	PSN_img := "C:Users사용자이름PicturesMyImg1.jpg"
-	Is_Admin := 0
-	WearableSN := "wsn1111"
-	GroupCode := "0001"
-	GroupName := "그룹1"
-	Address := "경기도 화성서 17-1"
-
-	responseSubGroup := UserSubGroupModel{UUID, Email, DisplayName, Token, PSN, PSN_img, Is_Admin, WearableSN}
-	responseGroupList := GroupListModel{GroupCode, GroupName, Address}
-	c.JSON(http.StatusOK, gin.H{
-		"data": gin.H{
-			"subGroup":  responseSubGroup,
-			"GroupList": responseGroupList,
-		},
-	})
-
-}
-
-func DeviceGroupLookUp(c *gin.Context) {
+func GroupAll(c *gin.Context) {
 	db, err := database.Mariadb()
 	//var data UserSubGroupModel
 	if err != nil {
@@ -189,7 +155,142 @@ func DeviceGroupLookUp(c *gin.Context) {
 		return
 	}
 
-	rows, err := db.Query("SELECT * FROM kiosk_set")
+	rows, err := db.Query("select Group_code,address,Group_name from group_list")
+	defer db.Close()
+	cols, err := rows.Columns()
+	if err != nil {
+		return
+	}
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
+	}
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": results,
+	})
+}
+
+func SubGroupAll(c *gin.Context)  {
+	db, err := database.Mariadb()
+	//var data UserSubGroupModel
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	rows, err := db.Query("select u.UUID,u.email,u.displayname,u.token,u.is_admin,g.Group_code,g.address,g.Group_name from user_info as u join group_list as g on u.group_code=g.group_code")
+	defer db.Close()
+	cols, err := rows.Columns()
+	if err != nil {
+		return
+	}
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
+	}
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": results,
+	})
+}
+
+func SubGroupLookup(c *gin.Context) {
+	//UUID := "이용자1"
+	//Email := "uuid@naver.com"
+	//DisplayName := "이용자1"
+	//Token := "aaaa.bbbb.cccc"
+	//PSN := "12가34나"
+	//PSN_img := "C:Users사용자이름PicturesMyImg1.jpg"
+	//Is_Admin := 0
+	//WearableSN := "wsn1111"
+	//GroupCode := "0001"
+	//GroupName := "그룹1"
+	//Address := "경기도 화성서 17-1"
+	//
+	//responseSubGroup := UserSubGroupModel{UUID, Email, DisplayName, Token, PSN, PSN_img, Is_Admin, WearableSN}
+	//responseGroupList := GroupListModel{GroupCode, GroupName, Address}
+	groupCode := c.Query("groupCode")
+	db, err := database.Mariadb()
+	//var data UserSubGroupModel
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	rows, err := db.Query("select u.UUID,u.email,u.displayname,u.token,u.psn,u.psn_img,u.Is_admin,u.wearable_sn,u.group_code,g.group_name,g.address,g.group_log from user_info as u join group_list as g on u.Group_code=g.Group_code where u.group_code=?",groupCode)
+
+	defer db.Close()
+	cols, err := rows.Columns()
+	if err != nil {
+		return
+	}
+	data := make([]interface{}, len(cols))
+
+	for i, _ := range data {
+		var d []byte
+		data[i] = &d
+	}
+	results := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		err := rows.Scan(data...)
+		if err != nil {
+			return
+		}
+		result := make(map[string]interface{})
+		for i, item := range data {
+			result[cols[i]] = string(*(item.(*[]byte)))
+		}
+		results = append(results, result)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": results,
+	})
+
+}
+
+func DeviceGroupLookUp(c *gin.Context) {
+	groupCode := c.Query("groupCode")
+	db, err := database.Mariadb()
+	//var data UserSubGroupModel
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	rows, err := db.Query("select *from kiosk_set where group_code=?",groupCode)
 	defer db.Close()
 	cols, err := rows.Columns()
 	if err != nil {
@@ -220,6 +321,7 @@ func DeviceGroupLookUp(c *gin.Context) {
 	})
 }
 func DeviceGroupLookUp1(c *gin.Context) {
+	groupCode := c.Query("groupCode")
 	db, err := database.Mariadb()
 	//var data UserSubGroupModel
 	if err != nil {
@@ -228,7 +330,7 @@ func DeviceGroupLookUp1(c *gin.Context) {
 		return
 	}
 
-	rows, err := db.Query("select Group_code,building_name,detail_position,kiosk_sn,latitude,longitude from kiosk_set where group_code=?  ", "041-31499-g1")
+	rows, err := db.Query("select Group_code,building_name,detail_position,kiosk_sn,latitude,longitude from kiosk_set where group_code=?  ", groupCode)
 	defer db.Close()
 	cols, err := rows.Columns()
 	if err != nil {
@@ -335,7 +437,6 @@ func AdminAccountLook(c *gin.Context) {
 		//		"Is_admin" : 1,
 		//		"werable_SN" : "wsn1119",
 		//		},
-		"valid": "true",
 	})
 	return
 }
@@ -346,13 +447,14 @@ func AdminAccounthDel(c *gin.Context) {
 	})
 }
 
-func AdminAccountPost(c *gin.Context) {
-	c.JSON(http.StatusCreated, gin.H{
+func AdminAccountPut(c *gin.Context) {
+	c.JSON(http.StatusAccepted, gin.H{
 		"rtmsg": "Success",
 	})
 }
 
 func AdminUserLook(c *gin.Context) {
+	wearable_SN := c.Query("wearable_SN")
 	db, err := database.Mariadb()
 	if err != nil {
 		// can't connect database return status code 500
@@ -360,7 +462,7 @@ func AdminUserLook(c *gin.Context) {
 		return
 	}
 
-	rows, err := db.Query("select latitude, longitude, building_name, date, time, group_code from user_log where wearable_sn=?", "wsn1111")
+	rows, err := db.Query("select latitude, longitude, building_name, date, time, group_code from user_log where wearable_sn=?", wearable_SN)
 	defer db.Close()
 	cols, err := rows.Columns()
 	if err != nil {
@@ -391,6 +493,7 @@ func AdminUserLook(c *gin.Context) {
 }
 
 func AdminOtherUserLook(c *gin.Context) {
+	wearable_SN := c.Query("wearable_SN")
 	db, err := database.Mariadb()
 	if err != nil {
 		// can't connect database return status code 500
@@ -400,8 +503,8 @@ func AdminOtherUserLook(c *gin.Context) {
 
 	wearableSN := "WSN1111"
 
-	rows, err := db.Query("select latitude,longitude,building_name,time from user_log where building_name=(select building_name from user_log where wearable_sn= ? group by building_name)", wearableSN)
-	// 이부분 에러
+	rows, err := db.Query("select latitude,longitude,building_name,time from user_log where building_name=(select building_name from user_log where wearable_sn= ? group by building_name)",wearableSN)
+
 	defer db.Close()
 	fmt.Printf("", rows, 123)
 	cols, err := rows.Columns()
@@ -429,7 +532,7 @@ func AdminOtherUserLook(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
-			"werable_SN": wearableSN,
+			"werable_SN": wearable_SN,
 			"log":        results,
 		},
 	})
@@ -515,6 +618,80 @@ func DeviceMT(c *gin.Context) {
 	})
 
 }
+
+func DataGraph(c *gin.Context)  {
+	db, err := database.Mariadb()
+	//var data UserSubGroupModel
+	if err != nil {
+		// can't connect database return status code 500
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+		rows, err := db.Query("select date, avg(temp) from user_log where date >= date(subdate(now(),INTERVAL 8 DAY)) and date <= date(now()) Group by date;")
+		defer db.Close()
+		cols, err := rows.Columns()
+		if err != nil {
+			return
+		}
+		data := make([]interface{}, len(cols))
+
+		for i, _ := range data {
+			var d []byte
+			data[i] = &d
+		}
+		results := make([]map[string]interface{}, 0)
+		for rows.Next() {
+			err := rows.Scan(data...)
+			if err != nil {
+				return
+			}
+			result := make(map[string]interface{})
+			for i, item := range data {
+				result[cols[i]] = string(*(item.(*[]byte)))
+			}
+			results = append(results, result)
+		}
+
+
+	//
+
+	rows2, err2 := db.Query("select building_name,count(building_name) from user_log group by building_name order by count(building_name) desc LIMIT 6")
+	defer db.Close()
+	cols2, err2 := rows2.Columns()
+	if err2 != nil {
+		return
+	}
+	data2 := make([]interface{}, len(cols2))
+
+	for i2, _ := range data2 {
+		var d2 []byte
+		data2[i2] = &d2
+	}
+	results2 := make([]map[string]interface{}, 0)
+	for rows2.Next() {
+		err2 := rows2.Scan(data2...)
+		if err2 != nil {
+			return
+		}
+		result2 := make(map[string]interface{})
+		for i2, item2 := range data2 {
+			result2[cols2[i2]] = string(*(item2.(*[]byte)))
+		}
+		results2 = append(results2, result2)
+	}
+	//fmt.Printf("", rows, 123)
+
+
+	c.JSON(http.StatusOK, gin.H{
+		"temperature": gin.H{
+			"day": results,
+			//"week": results2,
+		},
+		"visited_building": results2,
+	})
+}
+
 
 func Dashboard(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
