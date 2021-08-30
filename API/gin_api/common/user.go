@@ -13,7 +13,7 @@ import (
 type AppUserInfoModel struct {
 	PSN        string `json:"PSN" example:"12가34나"`
 	WearableSN string `json:"Wearable_SN" example:"wsn1111"`
-	Is_Admin   int    `json:"Is_Admin" example:"0" format"int63"`
+	Is_Admin   int    `json:"Is_Admin" example:"0"`
 }
 
 type UserInfoModel struct {

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	swaggerFiles "github.com/swaggo/files"
@@ -10,7 +8,6 @@ import (
 
 	"net/http"
 	"nfc_api/common"
-	"nfc_api/database"
 	_ "nfc_api/docs"
 	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
@@ -63,105 +60,120 @@ func setupRouter() *gin.Engine {
 
 		}
 		commomn_router.POST("/device-add", func(c *gin.Context) {
-			Wearable_SN := c.Query("Wearable_SN")
-			UUID := c.Query("UUID")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("INSERT into user_info (wearable_SN, UUID) values (?,?) ", Wearable_SN, UUID)
-			if err != nil {
-				_, err = db.Exec("UPDATE user_info SET wearable_SN = ? WHERE UUID = ?", Wearable_SN, UUID)
-				if err != nil {
-					rtmsg = "Failed"
-					log.Fatal("insert error: ", err)
-				}
-			}
+			// Wearable_SN := c.Query("Wearable_SN")
+			// UUID := c.Query("UUID")
+			// db, err := database.Mariadb()
+			// if err != nil {
+			// 	c.AbortWithStatus(http.StatusInternalServerError)
+			// 	return
+			// }
+			// defer db.Close()
+			// rtmsg := "Success"
+			// _, err = db.Exec("INSERT into user_info (wearable_SN, UUID) values (?,?) ", Wearable_SN, UUID)
+			// if err != nil {
+			// 	_, err = db.Exec("UPDATE user_info SET wearable_SN = ? WHERE UUID = ?", Wearable_SN, UUID)
+			// 	if err != nil {
+			// 		rtmsg = "Failed"
+			// 		log.Fatal("insert error: ", err)
+			// 	}
+			// }
 			c.JSON(http.StatusCreated, gin.H{
-				"rtmsg": rtmsg,
+				// "rtmsg": rtmsg,
+				"rtmsg": "Success",
 			})
 		})
 		commomn_router.DELETE("/device-del", func(c *gin.Context) {
-			Wearable_SN := c.Query("Wearable_SN")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET wearable_SN = NULL WHERE wearable_SN = ?", Wearable_SN)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("delete error: ", err)
-			}
+			// Wearable_SN := c.Query("Wearable_SN")
+			// db, err := database.Mariadb()
+			// if err != nil {
+			// 	c.AbortWithStatus(http.StatusInternalServerError)
+			// 	return
+			// }
+			// defer db.Close()
+			// rtmsg := "Success"
+			// _, err = db.Exec("UPDATE user_info SET wearable_SN = NULL WHERE wearable_SN = ?", Wearable_SN)
+			// if err != nil {
+			// 	rtmsg = "Failed"
+			// 	log.Fatal("delete error: ", err)
+			// }
 			c.JSON(http.StatusAccepted, gin.H{
-				"rtmsg": rtmsg,
+				// "rtmsg": rtmsg,
+				"rtmsg": "Success",
 			})
 		})
 		commomn_router.POST("/user/pid", func(c *gin.Context) {
-			PSN := c.Query("PSN")
-			PSN_img := c.Query("PSN_img")
-			UUID := c.Query("UUID")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET PSN = ?, PSN_img = ? WHERE UUID = ?", PSN, PSN_img, UUID)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("insert into users error: ", err)
-			}
+			// PSN := c.Query("PSN")
+			// PSN_img := c.Query("PSN_img")
+			// UUID := c.Query("UUID")
+			// db, err := database.Mariadb()
+			// if err != nil {
+			// 	c.AbortWithStatus(http.StatusInternalServerError)
+			// 	return
+			// }
+			// defer db.Close()
+			// rtmsg := "Success"
+			// _, err = db.Exec("UPDATE user_info SET PSN = ?, PSN_img = ? WHERE UUID = ?", PSN, PSN_img, UUID)
+			// if err != nil {
+			// 	rtmsg = "Failed"
+			// 	log.Fatal("insert into users error: ", err)
+			// }
 			c.JSON(http.StatusCreated, gin.H{
-				"rtmsg": rtmsg,
+				// "rtmsg": rtmsg,
+				"rtmsg": "Success",
 			})
 		})
 		commomn_router.DELETE("/user/pid", func(c *gin.Context) {
-			PSN := c.Query("PSN")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET PSN = NULL, PSN_img = NULL WHERE PSN = ?", PSN)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("delete error: ", err)
-			}
+			// PSN := c.Query("PSN")
+			// db, err := database.Mariadb()
+			// if err != nil {
+			// 	c.AbortWithStatus(http.StatusInternalServerError)
+			// 	return
+			// }
+			// defer db.Close()
+			// rtmsg := "Success"
+			// _, err = db.Exec("UPDATE user_info SET PSN = NULL, PSN_img = NULL WHERE PSN = ?", PSN)
+			// if err != nil {
+			// 	rtmsg = "Failed"
+			// 	log.Fatal("delete error: ", err)
+			// }
 			c.JSON(http.StatusAccepted, gin.H{
-				"rtmsg": rtmsg,
+				// "rtmsg": rtmsg,
+				"rtmsg": "Success",
 			})
 		})
 		commomn_router.GET("/userlog/visitHistory", common.VisitHistory)
 		commomn_router.POST("/user/FBToken", func(c *gin.Context) {
-			UUID := c.Query("UUID")
-			token := c.Query("token")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET token = ? WHERE UUID = ?", token, UUID)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("insert into users error: ", err)
-			}
+			// UUID := c.Query("UUID")
+			// token := c.Query("token")
+			// db, err := database.Mariadb()
+			// if err != nil {
+			// 	c.AbortWithStatus(http.StatusInternalServerError)
+			// 	return
+			// }
+			// defer db.Close()
+			// rtmsg := "Success"
+			// _, err = db.Exec("UPDATE user_info SET token = ? WHERE UUID = ?", token, UUID)
+			// if err != nil {
+			// 	rtmsg = "Failed"
+			// 	log.Fatal("insert into users error: ", err)
+			// }
 			c.JSON(http.StatusCreated, gin.H{
-				"rtmsg": rtmsg,
+				// "rtmsg": rtmsg,
+				"rtmsg": "Success",
 			})
 		})
 		commomn_router.GET("/user/userinfo", common.AppUserInfo)
 		commomn_router.POST("/user/change", func(c *gin.Context) {
+			// UUID := c.Query("UUID")
+			// topic := c.Query("topic")
+			// logFile, err := os.OpenFile("logfile.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+			// if err != nil {
+			// 	panic(err)
+			// }
+			// defer logFile.Close()
+			// log.SetOutput(logFile)
+
+			// log.Println(UUID, "adds topic", topic)
 
 			c.JSON(http.StatusCreated, gin.H{
 				"rtmsg": "Success",
