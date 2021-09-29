@@ -62,7 +62,7 @@ func AppUserInfo(c *gin.Context) {
 	defer db.Close()
 	rows, err := db.Query("Select UUID, email, displayname, PSN, wearable_SN, Is_admin FROM user_info where UUID = ?", UUID)
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
 	}
 	defer rows.Close()
 	var responseMessage AppUserInfoModel
@@ -87,38 +87,38 @@ func AppUserInfo(c *gin.Context) {
 	})
 }
 
+type CommonUserInfoRequest struct {
+	UUID string `json:"UUID"`
+}
+type CommonUserInfoResponse struct {
+	Name      string `json:"name"`
+	Token     string `json:"token"`
+	Email     string `json:"email"`
+	Approve   bool   `json:"approve"`
+	GroupCode string `json:"groupCode"`
+	Address   string `json:"address"`
+	GroupName string `json:"groupName"`
+}
+
 func CommonUserInfo(c *gin.Context) {
-	Type := c.Query("type")
+	req := &CommonUserInfoRequest{}
+	res := &CommonUserInfoResponse{}
+	c.BindJSON(req)
 
-	//Level := 0
-	//Name := "홍길동"
-	//Token := "aaaa.bbbb.cccc"
-	//Email := "uuid@naver.com"
-	//responseMessage := UserInfoModel{Level, Name, Token, Email}
-
-	if Type == "1" {
-		c.JSON(http.StatusOK, gin.H{
-			"rt": http.StatusOK,
-			"data": gin.H{
-				"level":     1,
-				"name":      "홍길동1",
-				"token":     "aaaa.bbbb.cccc",
-				"approve":   1,
-				"email":     "uuid1@naver.com",
-				"groupCode": "0001",
-				"address":   "경기도 화성시 17-1",
-				"groupName": "그룹1",
-			}})
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"rt": http.StatusOK,
-			"data": gin.H{
-				"level": 0,
-				"name":  "홍길동1",
-				"token": "aaaa.bbbb.cccc",
-			}})
-
+	db, err := database.Mariadb()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
 	}
+	defer db.Close()
+
+	err = db.QueryRow("select u.is_admin,u.displayname,u.token,u.email,a.status,g.group_code,g.address,g.group_name from user_info u join Authority a on u.uuid=a.uuid join group_list g on a.group_code=g.group_code where u.UUID=?", req.UUID).Scan()
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": res,
+		"rt":   http.StatusOK,
+	})
+
 }
 
 //if err != nil {
@@ -147,9 +147,15 @@ func UserLogin(c *gin.Context) {
 	c.Abort()
 }
 
+type CreateUserDeviceRequest struct {
+	WearableSn string `json:"Wearable_SN"`
+	Uuid       string `json:"UUID"`
+}
+
 func CreateUserDevice(c *gin.Context) {
-	Wearable_SN := c.Query("Wearable_SN")
-	UUID := c.Query("UUID")
+	req := &CreateUserDeviceRequest{}
+	c.BindJSON(req)
+
 	db, err := database.Mariadb()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -158,20 +164,39 @@ func CreateUserDevice(c *gin.Context) {
 	defer db.Close()
 	//rtmsg := "Success"
 
-	_, err = db.Exec("UPDATE user_info SET wearable_SN = ? WHERE UUID = ?", Wearable_SN, UUID)
+	dbResult, err := db.Exec("UPDATE user_info SET wearable_SN = ? WHERE UUID = ?", req.WearableSn, req.Uuid)
 	if err != nil {
-		//	rtmsg = "Failed"
-		log.Fatal("insert error: ", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"rtmsg": err,
+		})
+		return
+	}
+	updatedrow, err := dbResult.RowsAffected()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if updatedrow == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "wearableSN or uuid error",
+		})
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		// "rtmsg": rtmsg,
 		"rtmsg": "Success",
 	})
+}
+
+type DeleteUserDeviceRequest struct {
+	WearableSN string `json:"Wearable_SN"`
 }
 
 func DeleteUserDevice(c *gin.Context) {
-	Wearable_SN := c.Query("Wearable_SN")
+	req := &DeleteUserDeviceRequest{}
+	c.BindJSON(req)
+
 	db, err := database.Mariadb()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -179,10 +204,23 @@ func DeleteUserDevice(c *gin.Context) {
 	}
 	defer db.Close()
 	// rtmsg := "Success"
-	_, err = db.Exec("UPDATE user_info SET wearable_SN = NULL WHERE wearable_SN = ?", Wearable_SN)
+	dbResult, err := db.Exec("UPDATE user_info SET wearable_SN = NULL WHERE wearable_SN = ?", req.WearableSN)
 	if err != nil {
-		// 	rtmsg = "Failed"
-		log.Fatal("delete error: ", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"rtmsg": err,
+		})
+		return
+	}
+	updatedrow, err := dbResult.RowsAffected()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if updatedrow == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "wearableSN error",
+		})
+		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{
 		// "rtmsg": rtmsg,
@@ -190,30 +228,57 @@ func DeleteUserDevice(c *gin.Context) {
 	})
 }
 
+type CreateUserPsersonalNumberRequest struct {
+	Psn  string `json:"PSN"`
+	Uuid string `json:"UUID"`
+}
+
 func CreateUserPsersonalNumber(c *gin.Context) {
-	PSN := c.Query("PSN")
-	PSN_img := c.Query("PSN_img")
-	UUID := c.Query("UUID")
+	req := &CreateUserPsersonalNumberRequest{}
+	c.BindJSON(req)
+
 	db, err := database.Mariadb()
 	if err != nil {
-		c.AbortWithStatus(http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"rtmsg": "dbconnection error",
+		})
 		return
 	}
 	defer db.Close()
 	//rtmsg := "Success"
-	_, err = db.Exec("UPDATE user_info SET PSN = ?, PSN_img = ? WHERE UUID = ?", PSN, PSN_img, UUID)
+	dbResult, err := db.Exec("UPDATE user_info SET PSN = ? WHERE UUID = ?", req.Psn, req.Uuid)
 	if err != nil {
-		//	rtmsg = "Failed"
-		log.Fatal("insert into users error: ", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"rtmsg": err,
+		})
+		return
 	}
+	updatedrow, err := dbResult.RowsAffected()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if updatedrow == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "uuid error",
+		})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		// "rtmsg": rtmsg,
 		"rtmsg": "Success",
 	})
 }
 
+type DeleteUserPsersonalNumberRequest struct {
+	Psn string `json:"PSN"`
+}
+
 func DeleteUserPsersonalNumber(c *gin.Context) {
-	PSN := c.Query("PSN")
+	req := &DeleteUserPsersonalNumberRequest{}
+	c.BindJSON(req)
+
 	db, err := database.Mariadb()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -221,20 +286,41 @@ func DeleteUserPsersonalNumber(c *gin.Context) {
 	}
 	defer db.Close()
 	// rtmsg := "Success"
-	_, err = db.Exec("UPDATE user_info SET PSN = NULL, PSN_img = NULL WHERE PSN = ?", PSN)
+	dbResult, err := db.Exec("UPDATE user_info SET PSN = NULL, PSN_img = NULL WHERE PSN = ?", req.Psn)
 	if err != nil {
-		// 	rtmsg = "Failed"
-		log.Fatal("delete error: ", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"rtmsg": err,
+		})
+		return
 	}
+	updatedrow, err := dbResult.RowsAffected()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if updatedrow == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "psn error",
+		})
+		return
+	}
+
 	c.JSON(http.StatusAccepted, gin.H{
 		// "rtmsg": rtmsg,
 		"rtmsg": "Success",
 	})
 }
 
+type CreateFCMTokenRequest struct {
+	UUID  string `json:"UUID"`
+	Token string `json:"token"`
+}
+
 func CreateFCMToken(c *gin.Context) {
-	UUID := c.Query("UUID")
-	token := c.Query("token")
+
+	req := &CreateFCMTokenRequest{}
+	c.BindJSON(req)
+
 	db, err := database.Mariadb()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -242,20 +328,41 @@ func CreateFCMToken(c *gin.Context) {
 	}
 	defer db.Close()
 	// rtmsg := "Success"
-	_, err = db.Exec("UPDATE user_info SET token = ? WHERE UUID = ?", token, UUID)
+	dbResult, err := db.Exec("UPDATE user_info SET token = ? WHERE UUID = ?", req.Token, req.UUID)
 	if err != nil {
 		// rtmsg = "Failed"
-		log.Fatal("insert into users error: ", err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "db connection error",
+		})
+		return
 	}
+
+	updatedrow, err := dbResult.RowsAffected()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if updatedrow == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "uuid error",
+		})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		// "rtmsg": rtmsg,
 		"rtmsg": "Success",
 	})
 }
 
+type CreatePushChannelRequest struct {
+	UUID  string `json:"UUID"`
+	Topic string `json:"topic"`
+}
+
 func CreatePushChannel(c *gin.Context) {
-	UUID := c.Query("UUID")
-	topic := c.Query("topic")
+	req := &CreatePushChannelRequest{}
+	c.BindJSON(req)
 
 	logFile, err := os.OpenFile("logfile.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
@@ -265,7 +372,7 @@ func CreatePushChannel(c *gin.Context) {
 
 	log.SetOutput(logFile)
 
-	log.Println(UUID, "adds topic", topic)
+	log.Println(req.UUID, "adds topic", req.Topic)
 
 	c.JSON(http.StatusCreated, gin.H{
 		"rtmsg": "Success",
@@ -314,9 +421,14 @@ func SignUp(c *gin.Context) {
 	})
 }
 
+type ChangeUserNameRequest struct {
+	UUID        string `json:"UUID"`
+	DisplayName string `json:"displayname"`
+}
+
 func ChangeUserName(c *gin.Context) {
-	UUID := c.Query("UUID")
-	displayname := c.Query("displayname")
+	req := &ChangeUserNameRequest{}
+	c.BindJSON(req)
 
 	db, err := database.Mariadb()
 	if err != nil {
@@ -325,10 +437,25 @@ func ChangeUserName(c *gin.Context) {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("UPDATE user_info SET displayname = ? WHERE UUID = ?", displayname, UUID)
+	dbResult, err := db.Exec("UPDATE user_info SET displayname = ? WHERE UUID = ?", req.DisplayName, req.UUID)
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"rtmsg": err,
+		})
+		return
 	}
+	updatedrow, err := dbResult.RowsAffected()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if updatedrow == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "uuid error",
+		})
+		return
+	}
+
 	c.JSON(http.StatusAccepted, gin.H{
 		"rtmsg": "Success",
 	})

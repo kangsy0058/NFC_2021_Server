@@ -58,23 +58,23 @@ func setupRouter() *gin.Engine {
 			//====================================
 
 			// =========== 수정 필요 =============
-			commomn_router.POST("/user/change", common.CreatePushChannel)
-			commomn_router.DELETE("/user/change", common.DeletePushChannel)
-			commomn_router.GET("/user/login", common.UserLogin)
-			commomn_router.GET("/user/info", common.CommonUserInfo)
-			commomn_router.PATCH("/user/displayname", common.ChangeUserName)     //09.16 큰 상관은 없지만 UUID에 존재하지 않은 UUID 입력해도 Success나옵니다
-			commomn_router.POST("/user/device", common.CreateUserDevice)         // 09.16 Success는 돌아오는데 DB값이 그대로입니다
-			commomn_router.DELETE("/user/device", common.DeleteUserDevice)       ///09.16 Success는 돌아오는데 DB값이 그대로입니다
-			commomn_router.POST("/user/pid", common.CreateUserPsersonalNumber)   //09.16 Success는 돌아오는데 DB값이 그대로입니다
-			commomn_router.DELETE("/user/pid", common.DeleteUserPsersonalNumber) //09.16 Success는 돌아오는데 DB값이 그대로입니다
-			commomn_router.POST("/user/FBToken", common.CreateFCMToken)          // 09.16  Success는 돌아오는데 DB값이 그대로입니다
-			commomn_router.POST("/user/datainit", common.SignUp)                 //09.16  Error: socket hang up 나옵니다
+			commomn_router.POST("/user/change", common.CreatePushChannel)   //기능회의필요
+			commomn_router.DELETE("/user/change", common.DeletePushChannel) //기능회의필요
+			commomn_router.GET("/user/login", common.UserLogin)             // app 로그인기능으로사용 admin data없이
+			commomn_router.GET("/user/info", common.CommonUserInfo)         // admin level 설정후 다시 확인
+			commomn_router.POST("/user/datainit", common.SignUp)            //09.16  Error: socket hang up 나옵니다 // sql수정요청중 -> 동헌씨 9.29
 
 			// ===================================
 
 			// =========== 개발완료 =============
-			commomn_router.GET("/userlog/visitHistory", common.VisitHistory) //09.16😀
-			commomn_router.GET("/user/userinfo", common.AppUserInfo)         //09.16😀
+			commomn_router.GET("/userlog/visitHistory", common.VisitHistory)     //09.16😀
+			commomn_router.GET("/user/userinfo", common.AppUserInfo)             //09.16😀
+			commomn_router.POST("/user/FBToken", common.CreateFCMToken)          // 확인완료
+			commomn_router.PATCH("/user/displayname", common.ChangeUserName)     //확인완료
+			commomn_router.POST("/user/device", common.CreateUserDevice)         //확인완료
+			commomn_router.DELETE("/user/device", common.DeleteUserDevice)       //확인완료
+			commomn_router.POST("/user/pid", common.CreateUserPsersonalNumber)   //확인완료
+			commomn_router.DELETE("/user/pid", common.DeleteUserPsersonalNumber) //확인완료
 			// ===================================
 		}
 
@@ -97,7 +97,9 @@ func setupRouter() *gin.Engine {
 			// ===================================
 
 			// =========== 수정 필요 =============
-			user_admin_router.PUT("/subgroup/user", common.CreateGroupUser)
+			user_admin_router.PUT("/subgroup/user", common.CreateGroupUser) // 유저생성방식 변경후 작성
+			user_admin_router.PUT("/subgroup/group", common.CreateGroup)    // 유저생성방식 변경후 작성
+
 			user_admin_router.POST("/subgroup/authadd", common.GroupAuthAdd) //상위관리자 권한 부여
 			user_admin_router.GET("/dashboard/data-trends", common.Dashboard)
 			user_admin_router.GET("/dashboard/data-graph", common.DataGraph)
@@ -105,12 +107,10 @@ func setupRouter() *gin.Engine {
 			user_admin_router.PUT("/accountMGMT", common.ModifyUserAccount)    //자신 게정 수정
 			user_admin_router.DELETE("/accountMGMT", common.DeleteUserAccount) // 자신 계정 삭제
 			user_admin_router.GET("devicelog/lookup", common.DeivceLog)
-
 			user_admin_router.GET("/subgroup/device/lookup/all", common.DeviceGroupLookUp) ////파람값을 넣었는데 아무것도 안나옴
 			user_admin_router.POST("/subgroup/device/add", common.DevcieGroupAdd)          //socket hang up                                   //디바이스 생성
 			user_admin_router.DELETE("/subgroup/device/del", common.DeviceGroupDel)        //return은 오지만 데이터베이스에 반영이안됨                              //디바이스 삭제
 			user_admin_router.DELETE("/account", common.AdminAccounthDel)                  //return은 오지만 데이터베이스에 반영이안됨                                               //계정 삭제
-			user_admin_router.PUT("/subgroup/group", common.CreateGroup)                   //return은 오지만 데이터베이스에 반영이안됨
 			user_admin_router.POST("/wearabledevice", common.CreateWearableDevice)         //socket hang up    //웨어러블디바이스 생성
 			user_admin_router.PUT("/wearabledevice", common.ModifyWearableDevice)          //return은 오지만 수정이 안됩니다.    //웨어러블디바이스 수정
 			user_admin_router.DELETE("/wearabledevice", common.DeleteWearableDevice)       //return은 오지만 삭제가 안됩니다. //웨어러블디바이스 삭제
