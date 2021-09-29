@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  gin_api:
+    build:
+      context: ./gin_api
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - apinet
+
+  redis:
+    build:
+      context: ./redis
+      dockerfile: ./Dockerfile
+    networks:
+      - apinet
+    
+networks:
+  apinet:
+    driver: bridge

@@ -49,7 +49,8 @@ func VisitHistory(c *gin.Context) {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-
+	log.Println(start_date)
+	log.Println(end_date)
 	var responseMessage []UserLogModel
 	for rows.Next() {
 		var tmp UserLogModel
@@ -57,10 +58,10 @@ func VisitHistory(c *gin.Context) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		log.Println(tmp.Date)
 		tmp.Date = tmp.Date[:10]
 		responseMessage = append(responseMessage, tmp)
 	}
-	log.Println(responseMessage)
 	c.JSON(http.StatusOK, gin.H{
 		"User_log": responseMessage})
 }

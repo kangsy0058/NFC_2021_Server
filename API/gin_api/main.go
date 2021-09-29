@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	swaggerFiles "github.com/swaggo/files"
@@ -10,7 +8,6 @@ import (
 
 	"net/http"
 	"nfc_api/common"
-	"nfc_api/database"
 	_ "nfc_api/docs"
 	"nfc_api/firebaseauth"
 	"nfc_api/kiosk"
@@ -45,9 +42,10 @@ func setupRouter() *gin.Engine {
 		// Kiosk API
 		kiosk_router := v1.Group("/kiosk")
 		{
+			// =========== 수정 필요 =============
 			kiosk_router.GET("/sncheck/:werableSN", kiosk.CheckWearableSN)
 			kiosk_router.POST("/userlog", kiosk.Userlog)
-
+			//====================================
 		}
 
 		//Common API
@@ -55,129 +53,33 @@ func setupRouter() *gin.Engine {
 		commomn_router := v1.Group("/common")
 		//commomn_router.Use(firebaseauth.FirebaseAuthMiddleware())
 		{
-			commomn_router.GET("/test", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "pong",
-				})
-			})
+			// =========== 테스트 필요 ==========
 
+			//====================================
+
+			// =========== 수정 필요 =============
+			commomn_router.POST("/user/change", common.CreatePushChannel)
+			commomn_router.DELETE("/user/change", common.DeletePushChannel)
+			commomn_router.GET("/user/login", common.UserLogin)
+			commomn_router.GET("/user/info", common.CommonUserInfo)
+			commomn_router.PATCH("/user/displayname", common.ChangeUserName)     //09.16 큰 상관은 없지만 UUID에 존재하지 않은 UUID 입력해도 Success나옵니다
+			commomn_router.POST("/user/device", common.CreateUserDevice)         // 09.16 Success는 돌아오는데 DB값이 그대로입니다
+			commomn_router.DELETE("/user/device", common.DeleteUserDevice)       ///09.16 Success는 돌아오는데 DB값이 그대로입니다
+			commomn_router.POST("/user/pid", common.CreateUserPsersonalNumber)   //09.16 Success는 돌아오는데 DB값이 그대로입니다
+			commomn_router.DELETE("/user/pid", common.DeleteUserPsersonalNumber) //09.16 Success는 돌아오는데 DB값이 그대로입니다
+			commomn_router.POST("/user/FBToken", common.CreateFCMToken)          // 09.16  Success는 돌아오는데 DB값이 그대로입니다
+			commomn_router.POST("/user/datainit", common.SignUp)                 //09.16  Error: socket hang up 나옵니다
+
+			// ===================================
+
+			// =========== 개발완료 =============
+			commomn_router.GET("/userlog/visitHistory", common.VisitHistory) //09.16😀
+			commomn_router.GET("/user/userinfo", common.AppUserInfo)         //09.16😀
+			// ===================================
 		}
-		commomn_router.POST("/device-add", func(c *gin.Context) {
-			Wearable_SN := c.Query("Wearable_SN")
-			UUID := c.Query("UUID")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("INSERT into user_info (wearable_SN, UUID) values (?,?) ", Wearable_SN, UUID)
-			if err != nil {
-				_, err = db.Exec("UPDATE user_info SET wearable_SN = ? WHERE UUID = ?", Wearable_SN, UUID)
-				if err != nil {
-					rtmsg = "Failed"
-					log.Fatal("insert error: ", err)
-				}
-			}
-			c.JSON(http.StatusCreated, gin.H{
-				"rtmsg": rtmsg,
-			})
-		})
-		commomn_router.DELETE("/device-del", func(c *gin.Context) {
-			Wearable_SN := c.Query("Wearable_SN")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET wearable_SN = NULL WHERE wearable_SN = ?", Wearable_SN)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("delete error: ", err)
-			}
-			c.JSON(http.StatusAccepted, gin.H{
-				"rtmsg": rtmsg,
-			})
-		})
-		commomn_router.POST("/user/pid", func(c *gin.Context) {
-			PSN := c.Query("PSN")
-			PSN_img := c.Query("PSN_img")
-			UUID := c.Query("UUID")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET PSN = ?, PSN_img = ? WHERE UUID = ?", PSN, PSN_img, UUID)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("insert into users error: ", err)
-			}
-			c.JSON(http.StatusCreated, gin.H{
-				"rtmsg": rtmsg,
-			})
-		})
-		commomn_router.DELETE("/user/pid", func(c *gin.Context) {
-			PSN := c.Query("PSN")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET PSN = NULL, PSN_img = NULL WHERE PSN = ?", PSN)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("delete error: ", err)
-			}
-			c.JSON(http.StatusAccepted, gin.H{
-				"rtmsg": rtmsg,
-			})
-		})
-		commomn_router.GET("/userlog/visitHistory", common.VisitHistory)
-		commomn_router.POST("/user/FBToken", func(c *gin.Context) {
-			UUID := c.Query("UUID")
-			token := c.Query("token")
-			db, err := database.Mariadb()
-			if err != nil {
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
-			defer db.Close()
-			rtmsg := "Success"
-			_, err = db.Exec("UPDATE user_info SET token = ? WHERE UUID = ?", token, UUID)
-			if err != nil {
-				rtmsg = "Failed"
-				log.Fatal("insert into users error: ", err)
-			}
-			c.JSON(http.StatusCreated, gin.H{
-				"rtmsg": rtmsg,
-			})
-		})
-		commomn_router.GET("/user/userinfo", common.AppUserInfo)
-		commomn_router.POST("/user/change", func(c *gin.Context) {
-
-			c.JSON(http.StatusCreated, gin.H{
-				"rtmsg": "Success",
-			})
-		})
-		commomn_router.DELETE("/user/change", func(c *gin.Context) {
-
-			c.JSON(http.StatusAccepted, gin.H{
-				"rtmsg": "Success",
-			})
-		})
-
-		//web
-		commomn_router.GET("/user/login", common.UserLogin)
 
 		//kiosk_Admin API
+		// kiosk에 통합 또는 이전 상의
 		kiosk_admin_router := v1.Group("/kioskadmin")
 		{
 			kiosk_admin_router.GET("/test", func(c *gin.Context) {
@@ -190,18 +92,49 @@ func setupRouter() *gin.Engine {
 		//userlog_Admin API
 		user_admin_router := v1.Group("/useradmin")
 		{
-			user_admin_router.GET("/test", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"message": "pong",
-					"code":    http.StatusOK,
-				})
-			})
-			//web
-			user_admin_router.GET("/subgroup/lookup", common.SubGroupLookup)
-			user_admin_router.GET("/subgroup/device/lookup/all", common.DeviceGroupLookUp)
-			user_admin_router.GET("/subgroup/device/lookup/group", common.DeviceGroupLookUp)
-		}
+			// =========== 테스트 필요 ==========
 
+			// ===================================
+
+			// =========== 수정 필요 =============
+			user_admin_router.PUT("/subgroup/user", common.CreateGroupUser)
+			user_admin_router.POST("/subgroup/authadd", common.GroupAuthAdd) //상위관리자 권한 부여
+			user_admin_router.GET("/dashboard/data-trends", common.Dashboard)
+			user_admin_router.GET("/dashboard/data-graph", common.DataGraph)
+			user_admin_router.GET("/deviceMGMT", common.DeviceMT)
+			user_admin_router.PUT("/accountMGMT", common.ModifyUserAccount)    //자신 게정 수정
+			user_admin_router.DELETE("/accountMGMT", common.DeleteUserAccount) // 자신 계정 삭제
+			user_admin_router.GET("devicelog/lookup", common.DeivceLog)
+
+			user_admin_router.GET("/subgroup/device/lookup/all", common.DeviceGroupLookUp) ////파람값을 넣었는데 아무것도 안나옴
+			user_admin_router.POST("/subgroup/device/add", common.DevcieGroupAdd)          //socket hang up                                   //디바이스 생성
+			user_admin_router.DELETE("/subgroup/device/del", common.DeviceGroupDel)        //return은 오지만 데이터베이스에 반영이안됨                              //디바이스 삭제
+			user_admin_router.DELETE("/account", common.AdminAccounthDel)                  //return은 오지만 데이터베이스에 반영이안됨                                               //계정 삭제
+			user_admin_router.PUT("/subgroup/group", common.CreateGroup)                   //return은 오지만 데이터베이스에 반영이안됨
+			user_admin_router.POST("/wearabledevice", common.CreateWearableDevice)         //socket hang up    //웨어러블디바이스 생성
+			user_admin_router.PUT("/wearabledevice", common.ModifyWearableDevice)          //return은 오지만 수정이 안됩니다.    //웨어러블디바이스 수정
+			user_admin_router.DELETE("/wearabledevice", common.DeleteWearableDevice)       //return은 오지만 삭제가 안됩니다. //웨어러블디바이스 삭제
+			user_admin_router.PUT("/deviceMGMT", common.ModifyUserDevice)                  //return은 오지만 수정이 안됩니다.  데이터베이스에 반영이안됨     //하위관리자 디바이스 생성 수정
+			user_admin_router.PUT("/account", common.AdminAccountPut)                      //return은 오지만 데이터베이스에 반영이안됨                                     //계정 수정
+
+			// ===================================
+
+			// =========== 개발완료 =============
+			user_admin_router.GET("/subgroup/lookup", common.SubGroupLookup)
+			user_admin_router.GET("/subgroup/group/all", common.GroupAll)           //그룹 목록 전체 조회
+			user_admin_router.GET("/subgroup/group/lookup/all", common.SubGroupAll) // (하위그룹관리)모든 하위관리자 그룹 정보 조회
+			user_admin_router.GET("/subgroup/device/lookup/group", common.DeviceGroupLookUp1)
+			user_admin_router.GET("/account", common.AdminAccountLook)                                                 //계정관리 조회
+			user_admin_router.GET("/wearabledevice/specificuserlook", common.AdminUserLook)                            //특정 사용자와 겹치는 사용자 조회
+			user_admin_router.GET("/wearabledevice/specificuserlook/specificuserotheruser", common.AdminOtherUserLook) //특정 사용자 req 일 때 동선 겹치는 사용자 파악
+			user_admin_router.GET("/wearabledevice", common.AdminDeviceLook)
+			user_admin_router.GET("/nfclog/lookup", common.AdminNFClog) // NFC 태그 기록
+
+			// ===================================
+			//작업중 user_admin_router.GET("/sendUser")
+			//작업중 user_amdin_router.GET("/sendGroup")
+			//작업중 user_admin_router.GET("/sendAll")
+		}
 	}
 	return r
 }

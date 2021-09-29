@@ -11,7 +11,7 @@ var ctx = context.Background()
 
 func RedisClient() *redis.Client {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "59.27.40.116:6379",
+		Addr:     "redis:6379",
 		Password: "hoseolab420",
 		DB:       0,
 	})
