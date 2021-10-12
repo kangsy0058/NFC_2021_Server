@@ -123,6 +123,9 @@ func AdminNFClog(c *gin.Context) {
 }
 
 func DeivceLog(c *gin.Context) {
+
+	groupcode := c.Param("groupcode")
+
 	db, err := database.Mariadb()
 	//var data UserSubGroupModel
 	if err != nil {
@@ -130,9 +133,9 @@ func DeivceLog(c *gin.Context) {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-
-	rows, err := db.Query("select *from user_log where Group_code=?", "041-31499-g1")
 	defer db.Close()
+
+	rows, err := db.Query("select * from user_log where Group_code=?", groupcode)
 	cols, err := rows.Columns()
 	if err != nil {
 		return

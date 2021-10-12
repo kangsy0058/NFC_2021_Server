@@ -2,10 +2,12 @@ package common
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"nfc_api/database"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -397,13 +399,17 @@ func DeletePushChannel(c *gin.Context) {
 	})
 }
 
+type SignUpRequest struct {
+	UUID        string `json:"UUID"`
+	Email       string `json:"Email"`
+	DisplayName string `json:"displayname"`
+	PSN         string `json:"PSN"`
+	WSN         string `json:"WSN"`
+}
+
 func SignUp(c *gin.Context) {
-	UUID := c.Query("UUID")
-	Email := c.Query("Email")
-	displayname := c.Query("displayname")
-	PSN := c.Query("PSN")
-	PSN_img := c.Query("PSN_img")
-	WSN := c.Query("WSN")
+	req := &SignUpRequest{}
+	c.BindJSON(req)
 
 	db, err := database.Mariadb()
 	if err != nil {
@@ -412,13 +418,40 @@ func SignUp(c *gin.Context) {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("insert into user_info(UUID,email,displayname,PSN,PSN_img,wearable_sn) values(?,?,?,?,?,?)", UUID, Email, displayname, PSN, PSN_img, WSN)
+	_, err = db.Exec("insert into user_info(UUID,email,displayname,PSN,PSN_img,wearable_sn,is_admin) values(?,?,?,?,?,?,?)", req.UUID, req.Email, req.DisplayName, req.PSN, nil, req.WSN, 0)
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"rtmsg": err,
+		})
+		return
 	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"rtmsg": "Success",
 	})
+}
+
+func CreateUserPsersonalImage(c *gin.Context) {
+	uuid := c.Param("uuid")
+
+	_, header, err := c.Request.FormFile("file")
+	if err != nil {
+		fmt.Println(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": err,
+		})
+		return
+	}
+
+	filenames := strings.Split(header.Filename, ".")
+	extention := filenames[len(filenames)-1]
+
+	c.SaveUploadedFile(header, "./personal_image/"+uuid+"."+extention)
+	c.JSON(http.StatusOK, gin.H{
+		"originfilename": header.Filename,
+		"savedfilename":  uuid + "." + extention,
+	})
+
 }
 
 type ChangeUserNameRequest struct {

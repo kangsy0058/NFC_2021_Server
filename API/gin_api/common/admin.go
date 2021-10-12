@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"nfc_api/database"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -237,13 +236,20 @@ func DeviceGroupLookUp1(c *gin.Context) {
 	})
 }
 
+type DeviceGroupAddRequest struct {
+	GroupCode      string  `json:"groupCode"`
+	KioskSN        string  `json:"kioskSN"`
+	DetailPosition string  `json:"detailPosition"`
+	BuildingName   string  `json:"buildingName"`
+	Latitude       float32 `json:"latitude"`
+	Longitude      float32 `json:"longitude"`
+}
+
 func DevcieGroupAdd(c *gin.Context) {
-	groupCode := c.Query("groupCode")
-	kioskSN := c.Query("kioskSN")
-	detailPosition := c.Query("detailPosition")
-	buildingName := c.Query("buildingName")
-	latitude := c.Query("latitude")
-	longtitide := c.Query("longtitide")
+
+	req := &DeviceGroupAddRequest{}
+	c.BindJSON(req)
+
 	db, err := database.Mariadb()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -251,19 +257,28 @@ func DevcieGroupAdd(c *gin.Context) {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("INSERT into kiosk_set (kiost_SN, Group_code, detail_position, building_name, latitude, longitude, kioskset_log) values (?,?,?,?,?,?,?) ", groupCode, kioskSN, detailPosition, buildingName, latitude, longtitide, time.Now())
+	_, err = db.Exec("INSERT into kiosk_set (kiosk_SN, Group_code, detail_position, building_name, latitude, longitude, kioskset_log) values (?,?,?,?,?,?,now()) ", req.KioskSN, req.GroupCode, req.DetailPosition, req.BuildingName, req.Latitude, req.Longitude)
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": err,
+		})
 		return
 	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"rtmsg": "Success",
 	})
 }
 
+type DeviceGroupDelRequest struct {
+	GroupCode string `json:"groupCode"`
+	KioskSN   string `json:"kioskSN"`
+}
+
 func DeviceGroupDel(c *gin.Context) {
-	groupCode := c.Query("groupCode")
-	kioskSN := c.Query("kioskSN")
+	req := &DeviceGroupDelRequest{}
+	c.BindJSON(req)
+
 	db, err := database.Mariadb()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -271,17 +286,53 @@ func DeviceGroupDel(c *gin.Context) {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("Delete from kiosk_set where kiosk_SN = ? AND Group_code = ?", kioskSN, groupCode)
+	dbResult, err := db.Exec("Delete from kiosk_set where kiosk_SN = ? AND Group_code = ?", req.KioskSN, req.GroupCode)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
+	updatedrow, err := dbResult.RowsAffected()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if updatedrow == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "delete error",
+		})
+		return
+	}
+
 	c.JSON(http.StatusAccepted, gin.H{
 		"rtmsg": "Success",
 	})
 }
 
+type GroupAuthAddRequest struct {
+	TargetUUID      string `json:"targetUUID"`
+	TargetGroupCode string `json:"targetGroupCode"`
+}
+
 func GroupAuthAdd(c *gin.Context) {
+	req := &GroupAuthAddRequest{}
+	c.BindJSON(req)
+
+	db, err := database.Mariadb()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"rtmsg": "database connection error",
+		})
+		return
+	}
+	defer db.Close()
+
+	_, err = db.Exec("insert into Authority(UUID,Group_code,status,Au_log) values(?,?,?,now())", req.TargetUUID, req.TargetGroupCode, "미승인")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"rtmsg": err,
+		})
+		return
+	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"rtmsg": "Success",
@@ -343,8 +394,14 @@ func AdminAccountLook(c *gin.Context) {
 	return
 }
 
+type AdminAccounthDelRequest struct {
+	UUID string `json:"uuid"`
+}
+
 func AdminAccounthDel(c *gin.Context) {
-	uuid := c.Query("uuid")
+	req := &AdminAccounthDelRequest{}
+	c.BindJSON(req)
+
 	db, err := database.Mariadb()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -352,9 +409,22 @@ func AdminAccounthDel(c *gin.Context) {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("Delete from user_info where UUID = ? ", uuid)
+	dbResult, err := db.Exec("Delete from user_info where UUID = ? ", req.UUID)
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
+	updatedrow, err := dbResult.RowsAffected()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if updatedrow == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "delete error",
+		})
 		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{
@@ -362,17 +432,20 @@ func AdminAccounthDel(c *gin.Context) {
 	})
 }
 
-func AdminAccountPut(c *gin.Context) {
-	uuid := c.Query("uuid")
-	email := c.Query("email")
-	displayname := c.Query("displayname")
-	token := c.Query("token")
-	PSN := c.Query("PSN")
-	PSN_img := c.Query("PSN_img")
-	is_admin := c.Query("Is_admin")
-	wearable_SN := c.Query("wearable_SN")
-	Groupcode := c.Query("Group_code")
+type AdminAccountPutRequest struct {
+	UUID        string `json:"uuid"`
+	Email       string `json:"email"`
+	DisplayName string `json:"displayname"`
+	Token       string `json:"token"`
+	PSN         string `json:"PSN"`
+	Is_admin    int32  `json:"Is_admin"`
+	WearableSN  string `json:"wearable_SN"`
+	GroupCode   string `json:"Group_code"`
+}
 
+func AdminAccountPut(c *gin.Context) {
+	req := &AdminAccountPutRequest{}
+	c.BindJSON(req)
 	db, err := database.Mariadb()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -380,9 +453,22 @@ func AdminAccountPut(c *gin.Context) {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("UPDATE user_info SET email = ?, displayname = ?, token = ?, PSN = ?, PSN_img = ?, Is_admin =?, wearable_SN = ?, Group_code = ? WHERE UUID = ?", email, displayname, token, PSN, PSN_img, is_admin, wearable_SN, Groupcode, uuid)
+	dbResult, err := db.Exec("UPDATE user_info SET email = ?, displayname = ?, token = ?, PSN = ?, PSN_img = ?, Is_admin =?, wearable_SN = ?, Group_code = ? WHERE UUID = ?", req.Email, req.DisplayName, req.Token, req.Token, req.GroupCode, req.Is_admin, req.WearableSN, req.GroupCode, req.UUID)
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
+	updatedrow, err := dbResult.RowsAffected()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if updatedrow == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "update error",
+		})
 		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{
@@ -476,7 +562,14 @@ func AdminOtherUserLook(c *gin.Context) {
 	return
 }
 
+type AdminDeviceLookRequest struct {
+	WearableSN string `json:"wearable_SN"`
+}
+
 func AdminDeviceLook(c *gin.Context) {
+	req := &AdminDeviceLookRequest{}
+	c.BindJSON(req)
+
 	db, err := database.Mariadb()
 	//var data UserSubGroupModel
 	if err != nil {
@@ -485,7 +578,7 @@ func AdminDeviceLook(c *gin.Context) {
 		return
 	}
 
-	rows, err := db.Query("select *from user_info where wearable_sn=?", "wsn1111")
+	rows, err := db.Query("select *from user_info where wearable_sn=?", req.WearableSN)
 	defer db.Close()
 	cols, err := rows.Columns()
 	if err != nil {
@@ -655,6 +748,22 @@ func DataGraph(c *gin.Context) {
 }
 
 func Dashboard(c *gin.Context) {
+
+	db, err := database.Mariadb()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	defer db.Close()
+
+	_, err = db.Exec("")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"rtmsg": err,
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"usedTerminalCount": gin.H{
 			"now":    30,
@@ -675,9 +784,14 @@ func Dashboard(c *gin.Context) {
 	})
 }
 
+type CreateWearableDeviceRequest struct {
+	UUID       string `json:"target_UUID"`
+	WearableSN string `json:"wearable_SN"`
+}
+
 func CreateWearableDevice(c *gin.Context) {
-	UUID := c.Query("target_UUID")
-	wearable_SN := c.Query("displayname")
+	req := &CreateWearableDeviceRequest{}
+	c.BindJSON(req)
 
 	db, err := database.Mariadb()
 	if err != nil {
@@ -685,10 +799,25 @@ func CreateWearableDevice(c *gin.Context) {
 		return
 	}
 	defer db.Close()
-	_, err = db.Exec("insert into user_info(UUID,wearable_sn) values(?,?) ", UUID, wearable_SN)
+
+	dbResult, err := db.Exec("insert into user_info(UUID,wearable_sn) values(?,?) ", req.UUID, req.WearableSN)
 	if err != nil {
-		log.Fatal(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
 	}
+	updatedrow, err := dbResult.RowsAffected()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	if updatedrow == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"rtmsg": "create error",
+		})
+		return
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"rtmsg": "Success",
 	})
