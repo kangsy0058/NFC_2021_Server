@@ -1,9 +1,20 @@
-FROM golang:1.16
+FROM golang:alpine AS builder
 
-WORKDIR /go/src/app
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
+
+WORKDIR /build
+
 COPY . .
 
-RUN go get -d -v ./...
-RUN go install -v ./...
+RUN go mod tidy
 
-CMD ["nfc_api"]
+RUN go build -o main .
+
+FROM scratch
+
+COPY --from=builder /build .
+
+ENTRYPOINT ["./main"]
