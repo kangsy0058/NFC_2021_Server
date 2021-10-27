@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
 func SubGroupLookup(c *gin.Context) {
 	//UUID := "이용자1"
 	//Email := "uuid@naver.com"

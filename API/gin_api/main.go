@@ -104,10 +104,6 @@ func setupRouter() *gin.Engine {
 			user_admin_router.GET("/dashboard/data-trends", common.Dashboard) // 안돼
 			user_admin_router.GET("/dashboard/data-graph", common.DataGraph)  // 작동하지만 일단위 이상함 그리고 일일 방문자와 불가능했던 사람 말고는 통계가 의미있는지?
 
-			user_admin_router.POST("/wearabledevice", common.CreateWearableDevice)   //sql문 wearable 테이블에 만드는거로 수정    //웨어러블디바이스 생성
-			user_admin_router.PUT("/wearabledevice", common.ModifyWearableDevice)    //return은 오지만 수정이 안됩니다.    //웨어러블디바이스 수정
-			user_admin_router.DELETE("/wearabledevice", common.DeleteWearableDevice) //return은 오지만 삭제가 안됩니다. //웨어러블디바이스 삭제 // 미쳤나
-
 			// ===================================
 
 			// =========== 개발완료 =============
@@ -139,6 +135,9 @@ func setupRouter() *gin.Engine {
 			user_admin_router.DELETE("/accountMGMT", common.DeleteUserAccount)             // 자신 계정 삭제
 			user_admin_router.GET("/subgroup/device/lookup/all", common.DeviceGroupLookUp) ////파람값을 넣었는데 아무것도 안나옴
 			user_admin_router.PUT("/deviceMGMT", common.ModifyUserDevice)                  //return은 오지만 수정이 안됩니다.  데이터베이스에 반영이안됨     //하위관리자 디바이스 생성 수정
+			user_admin_router.POST("/wearabledevice", common.CreateWearableDevice)         //sql문 wearable 테이블에 만드는거로 수정    //웨어러블디바이스 생성
+			user_admin_router.PUT("/wearabledevice", common.ModifyWearableDevice)          //return은 오지만 수정이 안됩니다.    //웨어러블디바이스 수정
+			user_admin_router.DELETE("/wearabledevice", common.DeleteWearableDevice)       //return은 오지만 삭제가 안됩니다. //웨어러블디바이스 삭제 //
 			//===============================
 
 		}
